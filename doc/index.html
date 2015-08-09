@@ -196,45 +196,127 @@
       <p>
         This guide covers the use of OdbResource and OdbRealm with Tomcat.
       </p>
-      <p>
-        There are two components that have to be configured at either the
-        context or server level. (context.xml or server.xml) They are the
-        Resource and the Realm.
-      </p>
-    </div>
 
-    <h3>Download and Install</h3>
-    <div class="content">
-      <p>
-        Configuring the resource
-      </p>
-    </div>
+      <div class="content">
+        <h3>Download and Install</h3>
+        <p>
+          <ol>
+            <li>
+              Download the latest binary release from the
+              <a href="https://github.com/skwidge/OdbResource/releases/"
+                 target="_blank">OdbResource release page on Github</a>. Or
+              download the source and build the <strong>dist</strong> target.
+            </li>
+            <li>
+              Unzip the file odbresource-[<em>version number</em>].zip in the lib
+              directory of Apache Tomcat.
+            </li>
+          </ol>
+        </p>
 
-    <h3>Configuration</h3>
-    <div class="content">
-      <p>
-        Configuring the resource
-      </p>
-    </div>
+        <h3>Configuration</h3>
+        <p>
+          There are two components that have to be configured at either the
+          context or server level. (context.xml or server.xml) They are the
+          Resource and the Realm.
+        </p>
 
-    <h4>OdbResource</h4>
-    <div class="content">
-      <p>
-        Configuring the resource
-      </p>
-    </div>
+        <div class="content">
+          <h4>OdbResource</h4>
+          <p>
+            The OrientGraphPoolFactory class must be configured as a JNDI
+            Resource in Tomcat. This must be done in either server.xml or the
+            context.xml file for the web application.
+          </p>
+          <p>
+            Putting the configuration in server.xml is generally more
+            appropriate. The OServer instance runs as a singleton anyway so the
+            configuration is effectively global wherever you put it. Two
+            different configurations in different context.xml files would
+            result in undefined behaviour. Most likely the first application to
+            be loaded would override any others.
+          </p>
+          <p>
+            <a href="https://tomcat.apache.org/tomcat-8.0-doc/config/context.html#Resource_Definitions">Tomcat's
+              guide on resource configuration is here</a>. Important things to
+            note for OdbResource configuration are:
+            <ol>
+              <li>
+                The auth attribute must have a value of "Container".
+              </li>
+              <li>
+                The closeMethod attribute must have a value of "shutdown".
+              </li>
+              <li>
+                The factory attribute must have a value of "com.ashtonit.odb.pool.OrientGraphPoolFactory".
+              </li>
+              <li>
+                The type attribute must have a value of "com.ashtonit.odb.pool.OrientGraphPool".
+              </li>
+              <li>
+                The singleton attribute must have a value of true, to ensure
+                that the close method is run. (In fact the OrientGraphPool
+                remains a singleton regardless of this attribute.)
+              </li>
+            </ol>
+          </p>
+          <p>
+            An example of a minimal resource definition would be:
+            <pre>
+              &lt;Resource
+                 auth="Container"
+                 closeMethod="shutdown"
+                 configFile="/mnt/share/orientdb-community-2.1/config/orientdb-server-config.xml"
+                 factory="com.ashtonit.odb.pool.OrientGraphPoolFactory"
+                 name="odbp"
+                 singleton="true"
+                 type="com.ashtonit.odb.pool.OrientGraphPool"
+               /&gt;
+            </pre>
+            The only attribute in the above element that is not described in the
+            Tomcat configuration guide is <strong>configFile</strong>. The value
+            should be the name of the OrientDB server configuration file. Refer
+            to the OrientDB manual if you edit this file. I have generally left
+            it untouched.
+          </p>
+          <p>
+            A complete resource definition with all optional attributes is:
+            <pre>
+              &lt;Resource
+                 auth="Container"
+                 closeMethod="shutdown"
+                 configFile="/mnt/share/orientdb-community-2.1/config/orientdb-server-config.xml"
+                 factory="com.ashtonit.odb.pool.OrientGraphPoolFactory"
+                 name="odbp"
+                 singleton="true"
+                 type="com.ashtonit.odb.pool.OrientGraphPool"
+                 commitOnShutdown="true"
+                 getWait="1000"
+                 perUserLimit="10"
+                 recycleCount="3"
+                 timeOut="10000"
+                 totalLimit="1000"
+               /&gt;
+            </pre>
+            An explanation of all the optional attributes above can be found in
+            the description of configuration parameters in the
+            <a href="file:///mnt/share/code/OdbResource/doc/api/com/ashtonit/odb/pool/OrientGraphPoolFactory.html"
+               target="_blank">javadocs for the OrientGraphPoolFactory
+              class</a>.
+          </p>
 
-    <h4>OdbRealm</h4>
-    <div class="content">
-      <p>
-        Configuring the resource
-      </p>
+          <h4>OdbRealm</h4>
+          <p>
+            Configuring the realm
+          </p>
+        </div>
+      </div>
     </div>
 
     <div>
       <hr class="divider"/>
     </div>
-
+    
     <div class="footer">
       &copy; Copyright Bruce Ashton 2015
     </div>
