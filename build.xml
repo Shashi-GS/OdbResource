@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Author:           Bruce Ashton
+   Date:             2014-06-22
+   Copyright (c):    Bruce Ashton, 2014
+-->
+<project name="OdbResource" basedir="." default="publish" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+	<property name="build" location="build" />
+	<property name="classes" location="classes" />
+	<property name="debug" value="true" />
+	<property name="classes" location="classes" />
+	<property name="doc" location="doc" />
+	<property name="lib" location="lib" />
+	<property name="source" value="1.8" />
+	<property name="src" location="src" />
+	<property name="target" value="1.8" />
+	<property name="version" value="0.1" />
+
+	<property name="api" location="${doc}/api" />
+	<property name="api.jdk8" value="http://docs.oracle.com/javase/8/docs/api/" />
+	<property name="api.tomcat8" value="http://tomcat.apache.org/tomcat-8.0-doc/api/" />
+	<property name="file.version" location="${src}/com/ashtonit/odb/Version.java" />
+	<property name="ivy.lib.dir" location="${lib}" />
+	<property name="ivyxml" value="${build}/ivy.xml" />
+	<property name="jarfile" location="${build}/odbresource.jar" />
+	<property name="distfile" location="odbresource-${version}.zip" />
+
+	<path id="classpath">
+		<fileset dir="${lib}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<resources id="products">
+		<fileset dir="${lib}">
+			<exclude name="tomcat-*" />
+		</fileset>
+		<mappedresources>
+			<fileset file="${jarfile}" />
+			<mapper type="glob" from="*.jar" to="*-${version}.jar" />
+		</mappedresources>
+	</resources>
+
+
+	<target name="all" depends="clean,publish,dist" />
+
+
+	<target name="dist" depends="build,doc">
+		<zip destfile="${distfile}">
+			<resources refid="products" />
+		</zip>
+	</target>
+
+
+	<target name="publish" depends="deliver">
+		<ivy:publish resolver="local" overwrite="true" revision="${version}" srcivypattern="${ivyxml}">
+			<artifacts pattern="${build}/[artifact].[ext]" />
+		</ivy:publish>
+	</target>
+
+
+	<target name="deliver" depends="build">
+		<ivy:deliver deliverpattern="${ivyxml}" pubrevision="${version}" />
+	</target>
+
+
+	<target name="build" depends="compile">
+		<jar destfile="${jarfile}">
+			<fileset dir="${classes}" />
+		</jar>
+	</target>
+
+
+	<target name="compile" depends="prepare,resolve,version">
+		<javac debug="${debug}" destdir="${classes}" includeAntRuntime="false" source="${source}" target="${target}">
+			<classpath refid="classpath" />
+			<src path="${src}" />
+		</javac>
+	</target>
+
+
+	<target name="doc" depends="prepare,resolve,version">
+		<javadoc access="public" destdir="${api}" noqualifier="java.*" source="${source}">
+			<classpath refid="classpath" />
+			<link href="${api.jdk8}" />
+			<link href="${api.tomcat8}" />
+			<packageset dir="${src}" />
+		</javadoc>
+	</target>
+
+
+	<target name="version">
+		<replaceregexp>
+			<fileset file="${file.version}" />
+			<regexp pattern='public static final String VERSION = ".*";' />
+			<substitution expression='public static final String VERSION = "${version}";' />
+		</replaceregexp>
+	</target>
+
+
+	<target name="resolve">
+		<ivy:retrieve sync="true" />
+	</target>
+
+
+	<target name="prepare">
+		<mkdir dir="${classes}" />
+		<mkdir dir="${build}" />
+		<mkdir dir="${api}" />
+	</target>
+
+
+	<target name="clean">
+		<delete dir="${api}" />
+		<delete dir="${build}" />
+		<delete dir="${classes}" />
+		<delete file="${distfile}" />
+		<delete>
+			<fileset dir="${ivy.lib.dir}">
+				<include name="*.jar" />
+			</fileset>
+		</delete>
+	</target>
+</project>

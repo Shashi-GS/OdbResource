@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Author:           Bruce Ashton
+   Date:             2014-06-22
+   Copyright (c):    Bruce Ashton, 2014
+-->
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+	<info organisation="com.ashtonit" module="odbresource" status="integration">
+		<ivyauthor name="Ashton I T Ltd" url="http://www.ashtonit.com" />
+		<description homepage="http://www.ashtonit.com/odbresource.html">
+			Tested with Apache Tomcat 8.0.9
+		</description>
+	</info>
+	<configurations>
+		<conf name="impl" description="Default OdbResource configuration" />
+	</configurations>
+	<publications>
+		<artifact name="odbresource" type="jar" conf="impl" ext="jar" />
+	</publications>
+	<dependencies defaultconf="*->*,!sources,!javadoc">
+		<dependency org="com.orientechnologies" name="orientdb-enterprise" rev="latest.release" transitive="true" />
+		<dependency org="com.orientechnologies" name="orientdb-graphdb" rev="latest.release" transitive="true" />
+		<dependency org="com.orientechnologies" name="orientdb-server" rev="latest.release" transitive="true" />
+		<dependency org="org.apache.tomcat" name="tomcat-catalina" rev="latest.release" transitive="false" />
+		<dependency org="org.apache.tomcat" name="tomcat-juli" rev="latest.release" transitive="false" />
+		<dependency org="org.apache.tomcat" name="tomcat-util" rev="latest.release" transitive="false" />
+		<dependency org="org.apache.tomcat" name="tomcat-util-scan" rev="latest.release" transitive="false" />
+		<exclude org="javax.servlet" />
+	</dependencies>
+</ivy-module>
