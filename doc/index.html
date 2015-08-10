@@ -237,7 +237,8 @@
             be loaded would override any others.
           </p>
           <p>
-            <a href="https://tomcat.apache.org/tomcat-8.0-doc/config/context.html#Resource_Definitions">Tomcat's
+            The <a href="https://tomcat.apache.org/tomcat-8.0-doc/config/context.html#Resource_Definitions"
+                   target="_blank">Tomcat
               guide on resource configuration is here</a>. Important things to
             note for OdbResource configuration are:
             <ol>
@@ -248,10 +249,12 @@
                 The closeMethod attribute must have a value of "shutdown".
               </li>
               <li>
-                The factory attribute must have a value of "com.ashtonit.odb.pool.OrientGraphPoolFactory".
+                The factory attribute must have a value of
+                "com.ashtonit.odb.pool.OrientGraphPoolFactory".
               </li>
               <li>
-                The type attribute must have a value of "com.ashtonit.odb.pool.OrientGraphPool".
+                The type attribute must have a value of
+                "com.ashtonit.odb.pool.OrientGraphPool".
               </li>
               <li>
                 The singleton attribute must have a value of true, to ensure
@@ -261,12 +264,12 @@
             </ol>
           </p>
           <p>
-            An example of a minimal resource definition would be:
+            An example of a minimal OdbResource definition would be:
             <pre>
               &lt;Resource
                  auth="Container"
                  closeMethod="shutdown"
-                 configFile="/mnt/share/orientdb-community-2.1/config/orientdb-server-config.xml"
+                 configFile="/opt/orientdb-community-2.1/config/orientdb-server-config.xml"
                  factory="com.ashtonit.odb.pool.OrientGraphPoolFactory"
                  name="odbp"
                  singleton="true"
@@ -280,12 +283,12 @@
             it untouched.
           </p>
           <p>
-            A complete resource definition with all optional attributes is:
+            A complete OdbResource definition with all optional attributes is:
             <pre>
               &lt;Resource
                  auth="Container"
                  closeMethod="shutdown"
-                 configFile="/mnt/share/orientdb-community-2.1/config/orientdb-server-config.xml"
+                 configFile="/opt/orientdb-community-2.1/config/orientdb-server-config.xml"
                  factory="com.ashtonit.odb.pool.OrientGraphPoolFactory"
                  name="odbp"
                  singleton="true"
@@ -307,9 +310,92 @@
 
           <h4>OdbRealm</h4>
           <p>
-            Configuring the realm
+            This is a fairly simple and restricted authentication Realm for
+            Tomcat. It only supports one form of authentication, the basic
+            username/password method. Attempting to use any other method will
+            result in an <em>UnsupportedOperationException</em>.
+          </p>
+          <p>
+            The <a href="https://tomcat.apache.org/tomcat-8.0-doc/config/realm.html"
+                           target="_blank">Tomcat guide on realm configuration
+              is here</a>. Important things to note for OdbRealm configuration
+            are:
+            <ol>
+              <li>
+                The className attribute must have a value of
+                "com.ashtonit.odb.realm.OdbRealm".
+              </li>
+              <li>
+                The value of the dbUser attribute must be the name of a user
+                with read access to the OUser class in the OrientDB database.
+                The "reader" user works very well for this.
+              </li>
+              <li>
+                The value of the dbResource attribute must match the value of
+                the "name" attribute in your OdbResource configuration.
+              </li>
+              <li>
+                The value of the dbUrl attribute must be a valid OrientDB URI.
+              </li>
+            </ol>
+          </p>
+          <p>
+            An example of an OdbRealm definition would be:
+            <pre>
+              &lt;Realm
+                className="com.ashtonit.odb.realm.OdbRealm"
+                dbPass="reader"
+                dbResource="odbp"
+                dbUrl="plocal:/opt/odb/mygraphdb"
+                dbUser="reader"
+              /&gt;
+            </pre>
           </p>
         </div>
+        <h3>A Servlet Example</h3>
+        <p>
+          Here we have a simple example showing how to look up the graph
+          database pool in the JNDI context, obtain and use an OrientGraph
+          instance and release it again.
+          <pre>
+            public class MyServlet extends HttpServlet {
+
+                public void service(HttpServletRequest request, HttpServletResponse response)
+                  throws ServletException, IOException {
+
+                    Context initCtx = new InitialContext();
+                    Context envCtx = (Context) initCtx.lookup("java:comp/env");
+                    OrientGraphPool pool = (OrientGraphPool) envCtx.lookup("odbp");
+                    OdbPrincipal principal = (OdbPrincipal) httpRequest.getUserPrincipal();
+
+                    OrientGraph graph = null;
+                    try {
+                        graph = pool.get(principal.getDbUrl(), principal.getName(), principal.getPassword());
+
+                        OrientVertex vertex = graph.getVertex("myVertexKey");
+	                out.println("&lt;html&gt;");
+	                out.println("&lt;body&gt;");
+		        out.println("&lt;h1&gt;");
+                        out.println(vertex.toString());
+		        out.println("&lt;/h1&gt;");
+		        out.println("&lt;/body&gt;");
+	                out.println("&lt;/html&gt;");
+	
+                    } finally {
+                        if (graph != null && !graph.isClosed()) {
+                            graph.shutdown();
+                        }
+                    }
+                }
+            }
+          </pre>
+          You may notice that the database URI is obtained from the principal.
+          This allows multiple databases, each defined by a different realm.
+          The OdbResource configuration defines the server, not the database.
+        </p>
+        <p>
+          Here endeth the user guide :)
+        </p>
       </div>
     </div>
 
