@@ -56,8 +56,8 @@ public class OdbRealm extends RealmBase {
 
 
     /**
-     * The default constructor sets the SHA-256 message digest credential
-     * handler and default configuration parameters as required.
+     * The default constructor sets the SHA-256 message digest credential handler and default configuration parameters
+     * as required.
      */
     public OdbRealm() {
         final MessageDigestCredentialHandler handler = new MessageDigestCredentialHandler();
@@ -75,14 +75,15 @@ public class OdbRealm extends RealmBase {
 
     /**
      * This method of authentication is not supported by this implementation.
-     * 
+     *
      * @param gssContext
      * @param storeCred
      * @return this method never returns
      * @see RealmBase#authenticate(GSSContext, boolean)
+     * @throws UnsupportedOperationException when called
      */
     @Override
-    public Principal authenticate(final GSSContext gssContext, final boolean storeCred) {
+    public Principal authenticate(final GSSContext gssContext, final boolean storeCred) throws UnsupportedOperationException {
         log.severe("authenticate(String): dbUrl=" + dbUrl);
         throw new UnsupportedOperationException();
     }
@@ -90,13 +91,14 @@ public class OdbRealm extends RealmBase {
 
     /**
      * This method of authentication is not supported by this implementation.
-     * 
+     *
      * @param username
      * @return this method never returns
      * @see RealmBase#authenticate(String)
+     * @throws UnsupportedOperationException when called
      */
     @Override
-    public Principal authenticate(final String username) {
+    public Principal authenticate(final String username) throws UnsupportedOperationException {
         log.severe("authenticate(String): username=" + username + " dbUrl=" + dbUrl);
         throw new UnsupportedOperationException();
     }
@@ -104,11 +106,10 @@ public class OdbRealm extends RealmBase {
 
     /**
      * Authenticates a database user.
-     * 
+     *
      * @param username the username to authenticate
      * @param password the password associated with the username
-     * @return an OdbPrincipal instance if authentication is successful, false
-     *         otherwise
+     * @return an OdbPrincipal instance if authentication is successful, null otherwise
      * @see RealmBase#authenticate(String, String)
      */
     @Override
@@ -147,7 +148,7 @@ public class OdbRealm extends RealmBase {
 
     /**
      * This method of authentication is not supported by this implementation.
-     * 
+     *
      * @param username
      * @param clientDigest
      * @param nonce
@@ -157,11 +158,11 @@ public class OdbRealm extends RealmBase {
      * @param realm
      * @param md5a2
      * @return this method never returns
-     * @see RealmBase#authenticate(String, String, String, String, String,
-     *      String, String, String)
+     * @see RealmBase#authenticate(String, String, String, String, String, String, String, String)
+     * @throws UnsupportedOperationException when called
      */
     @Override
-    public Principal authenticate(final String username, final String clientDigest, final String nonce, final String nc, final String cnonce, final String qop, final String realm, final String md5a2) {
+    public Principal authenticate(final String username, final String clientDigest, final String nonce, final String nc, final String cnonce, final String qop, final String realm, final String md5a2) throws UnsupportedOperationException {
         log.severe("authenticate(String, String, String, String, String, String, String, String): username=" + username
                 + " dbUrl=" + dbUrl);
         throw new UnsupportedOperationException();
@@ -170,21 +171,21 @@ public class OdbRealm extends RealmBase {
 
     /**
      * This method of authentication is not supported by this implementation.
-     * 
+     *
      * @param certs
      * @return this method never returns
      * @see RealmBase#authenticate(X509Certificate[])
+     * @throws UnsupportedOperationException when called
      */
     @Override
-    public Principal authenticate(final X509Certificate certs[]) {
+    public Principal authenticate(final X509Certificate certs[]) throws UnsupportedOperationException {
         log.severe("authenticate(X509Certificate[]): dbUrl=" + dbUrl);
         throw new UnsupportedOperationException();
     }
 
 
     /**
-     * The password for the generic user to connect to the database with so that
-     * we can look up the principal.
+     * The password for the generic user to connect to the database with so that we can look up the principal.
      *
      * @param dbPass the password for the generic user
      */
@@ -194,9 +195,8 @@ public class OdbRealm extends RealmBase {
 
 
     /**
-     * Sets the name of an arbitrary database resource class that is never used,
-     * but that may need to be discovered via the JNDI service for
-     * initialisation purposes before any user queries are made.
+     * Sets the name of an arbitrary database resource class that is never used, but that may need to be discovered via
+     * the JNDI service for initialisation purposes before any user queries are made.
      *
      * @param dbResource the JNDI name of the resource
      */
@@ -216,8 +216,8 @@ public class OdbRealm extends RealmBase {
 
 
     /**
-     * Sets the generic username to connect to the database with so that we can
-     * look up the principal. It only needs read permissions.
+     * Sets the generic username to connect to the database with so that we can look up the principal. It only needs
+     * read permissions.
      *
      * @param dbUser the generic username to connect to the database
      */
@@ -237,8 +237,7 @@ public class OdbRealm extends RealmBase {
 
 
     /**
-     * Return a short name for this Realm implementation, for use in log
-     * messages.
+     * Return a short name for this Realm implementation, for use in log messages.
      *
      * @return a short name for this Realm implementation
      * @see RealmBase#getName()
@@ -255,9 +254,10 @@ public class OdbRealm extends RealmBase {
      * @param username
      * @return his method never returns
      * @see RealmBase#getPassword(String)
+     * @throws UnsupportedOperationException when called
      */
     @Override
-    protected String getPassword(final String username) {
+    protected String getPassword(final String username) throws UnsupportedOperationException {
         log.severe("getPassword(String): username=" + username + " dbUrl=" + dbUrl);
         throw new UnsupportedOperationException();
     }
@@ -269,9 +269,10 @@ public class OdbRealm extends RealmBase {
      * @param username
      * @return his method never returns
      * @see RealmBase#getPrincipal(String)
+     * @throws UnsupportedOperationException when called
      */
     @Override
-    protected Principal getPrincipal(final String username) {
+    protected Principal getPrincipal(final String username) throws UnsupportedOperationException {
         log.severe("getPrincipal(String): username=" + username + " dbUrl=" + dbUrl);
         throw new UnsupportedOperationException();
     }
