@@ -34,6 +34,7 @@
 
 	<resources id="products">
 		<fileset dir="${lib}">
+			<exclude name="javax.*" />
 			<exclude name="tomcat-*" />
 		</fileset>
 		<mappedresources>

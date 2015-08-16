@@ -26,6 +26,5 @@
 		<dependency org="org.apache.tomcat" name="tomcat-juli" rev="latest.release" transitive="false" />
 		<dependency org="org.apache.tomcat" name="tomcat-util" rev="latest.release" transitive="false" />
 		<dependency org="org.apache.tomcat" name="tomcat-util-scan" rev="latest.release" transitive="false" />
-		<exclude org="javax.servlet" />
 	</dependencies>
 </ivy-module>

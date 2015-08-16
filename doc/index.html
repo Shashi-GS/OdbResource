@@ -176,15 +176,11 @@
       </p>
       <p>
         OdbResource is not so much a solution to these issues as a proof of
-        concept for the architecture I am suggesting. It is an implementation
-        of a pool for OrientGraph instances that can be bound to a JNDI service
-        and comes with OdbRealm, an OrientDB realm for Tomcat. It is far from
-        an ideal implementation though, for reasons discussed
+        concept for an architecture. It is an implementation of a pool for
+        OrientGraph instances that can be bound to a JNDI service and comes
+        with OdbRealm, an OrientDB realm for Tomcat. It is far from an ideal
+        implementation though, for reasons discussed
         <a href="whitepaper.html">elsewhere</a>.
-      </p>
-      <p>
-        The user guide is just below and a discussion of (and argument for) the
-        architecture is <em><a href="whitepaper.html">here</a></em>.
       </p>
     </div>
     <div>
@@ -205,7 +201,8 @@
               Download the latest binary release from the
               <a href="https://github.com/skwidge/OdbResource/releases/"
                  target="_blank">OdbResource release page on Github</a>. Or
-              download the source and build the <strong>dist</strong> target.
+              download the source and build the <strong>dist</strong> target
+              with ant.
             </li>
             <li>
               Unzip the file odbresource-[<em>version number</em>].zip in the lib
@@ -351,6 +348,9 @@
               /&gt;
             </pre>
           </p>
+          <p>
+            <em><strong>TODO</strong> Discussion of OdbPrincipal here...</em>
+          </p>
         </div>
         <h3>A Servlet Example</h3>
         <p>
@@ -393,6 +393,9 @@
           This allows multiple databases, each defined by a different realm.
           The OdbResource configuration defines the server, not the database.
         </p>
+          <p>
+            <em><strong>TODO</strong> Resource ref in web.xml</em>
+          </p>
         <p>
           Here endeth the user guide :)
         </p>
