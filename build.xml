@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-   Author:           Bruce Ashton
-   Date:             2014-06-22
-   Copyright (c):    Bruce Ashton, 2014
--->
+<!-- Author: Bruce Ashton Date: 2014-06-22 Copyright (c): Bruce Ashton, 2014 -->
 <project name="OdbResource" basedir="." default="publish" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<property name="build" location="build" />
@@ -20,6 +16,7 @@
 	<property name="api" location="${doc}/api" />
 	<property name="api.javaee7" value="http://docs.oracle.com/javaee/7/api/" />
 	<property name="api.jdk8" value="http://docs.oracle.com/javase/8/docs/api/" />
+	<property name="api.orientdb" value="http://orientdb.com/javadoc/latest/" />
 	<property name="api.tomcat8" value="http://tomcat.apache.org/tomcat-8.0-doc/api/" />
 	<property name="file.version" location="${src}/com/ashtonit/odb/Version.java" />
 	<property name="ivy.lib.dir" location="${lib}" />
@@ -87,6 +84,7 @@
 			<classpath refid="classpath" />
 			<link href="${api.javaee7}" />
 			<link href="${api.jdk8}" />
+			<link href="${api.orientdb}" />
 			<link href="${api.tomcat8}" />
 			<packageset dir="${src}" />
 		</javadoc>

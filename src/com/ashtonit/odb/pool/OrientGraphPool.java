@@ -4,12 +4,11 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 
 /**
- * An OrientGraphPool instance maintains a pool of OrientGraph instances. A call
- * to get() with url, username and password returns one to the caller. The
- * caller releases the instance back to the pool by calling shutdown() on the
- * OrientGraph instance with no arguments.
+ * An OrientGraphPool instance maintains a pool of OrientGraph instances. A call to {@link get(String, String, String)}
+ * with url, username and password returns one to the caller. The caller releases the instance back to the pool by
+ * calling {@link shutdown()} on the OrientGraph instance with no arguments.
  * <p>
- * Require Java 1.7 or above.
+ * Requires Java 1.7 or above.
  * </p>
  *
  * @author Bruce Ashton
@@ -18,8 +17,7 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 public interface OrientGraphPool {
 
     /**
-     * Return an OrientGraph instance initialised with the given URI, username
-     * and password.
+     * Return an OrientGraph instance initialised with the given URI, username and password.
      *
      * @param url an OrientDB database URI
      * @param username an OrientDB database username
@@ -31,8 +29,8 @@ public interface OrientGraphPool {
 
 
     /**
-     * Remove all OrientGraph instance from the pool that match the given URI
-     * and username. Call this method when a user logs out of an application.
+     * Remove all OrientGraph instances from the pool that match the given URI and username. Call this method when a
+     * user logs out of an application.
      *
      * @param uri an OrientDB database URI
      * @param username an OrientDB database username
@@ -41,8 +39,7 @@ public interface OrientGraphPool {
 
 
     /**
-     * Shut down the database instance. Actually just releases this instance
-     * back into the pool.
+     * Shut down the database instance. Actually just releases this instance back into the pool.
      */
     void shutdown();
 }

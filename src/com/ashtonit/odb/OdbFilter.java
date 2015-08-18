@@ -21,7 +21,36 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 
 /**
- * TODO
+ * <p>
+ * This class is responsible for obtaining an {@link OrientGraph} instance from {@link OrientGraphPool} and setting it
+ * as an attribute on the session object.
+ * </p>
+ * <p>
+ * It pulls two context parameters from the servlet context;
+ * </p>
+ * <p>
+ * <strong>orientGraph</strong> is used to set the name of the session attribute that will contain the instance of
+ * {@link OrientGraph} as its value.
+ * </p>
+ * <p>
+ * <strong>orientGraphPool</strong> sets the JNDI name of the graph database pool instance relative to, "java:comp/env".
+ * </p>
+ * <p>
+ * Both of these values can be configured in the web.xml file with a context-param element, as below;
+ * 
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;orientGraph&lt;/param-name&gt;
+ *     &lt;param-value&gt;graph&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * 
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;orientGraphPool&lt;/param-name&gt;
+ *     &lt;param-value&gt;odbp&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * 
+ * </p>
  *
  * @author Bruce Ashton
  * @date 2/07/2014
@@ -49,10 +78,15 @@ public class OdbFilter implements Filter {
 
 
     /**
-     * Get the database parameters from the user principal, create an OrientGraph object and set it as an attribute on
-     * the request. Clean up the OrientGraph object once the Servlet service method has completed. Set the principal as
-     * an attribute on the session so we can clean up database connections later.
-     *
+     * <p>
+     * Get the database parameters from the user principal, create an {@link OrientGraph} object and set it as an
+     * attribute on the request. Clean up the {@link OrientGraph} object once the Servlet service method has completed.
+     * Set the principal as an attribute on the session so we can clean up database connections later.
+     * </p>
+     * <p>
+     * It uses the <strong>orientGraph</strong> and <strong>orientGraphPool</strong> context parameters.
+     * </p>
+     * 
      * @param request the HTTP Servlet request object
      * @param response the HTTP Servlet response object
      * @param chain the chain object for the chain of command pattern.
@@ -86,8 +120,34 @@ public class OdbFilter implements Filter {
 
 
     /**
-     * Set the database URL.
-     *
+     * <p>
+     * This method pulls two context parameters from the servlet context;
+     * </p>
+     * <p>
+     * <strong>orientGraph</strong> is used to set the name of the session attribute that will contain the instance of
+     * {@link OrientGraph} as its value.
+     * </p>
+     * <p>
+     * <strong>orientGraphPool</strong> sets the JNDI name of the graph database pool instance relative to,
+     * "java:comp/env".
+     * </p>
+     * <p>
+     * Both of these values can be configured in the web.xml file with a context-param element, as below;
+     * 
+     * <pre>
+     * &lt;context-param&gt;
+     *     &lt;param-name&gt;orientGraph&lt;/param-name&gt;
+     *     &lt;param-value&gt;graph&lt;/param-value&gt;
+     * &lt;/context-param&gt;
+     * 
+     * &lt;context-param&gt;
+     *     &lt;param-name&gt;orientGraphPool&lt;/param-name&gt;
+     *     &lt;param-value&gt;odbp&lt;/param-value&gt;
+     * &lt;/context-param&gt;
+     * </pre>
+     * 
+     * </p>
+     * 
      * @param config the container object for filter parameters
      * @see Filter#init(FilterConfig)
      */

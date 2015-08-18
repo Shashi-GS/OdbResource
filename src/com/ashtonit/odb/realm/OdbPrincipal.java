@@ -14,8 +14,10 @@ import org.ietf.jgss.GSSCredential;
 
 
 /**
- * This class extends a GenericPrincipal and also contains a dbUrl property the
- * value of which must be the URL of the OrientDB database.
+ * This class extends {@link GenericPrincipal} and also contains a dbUrl property, the value of which must be the URL of
+ * the OrientDB database. The name, password and dbUrl properties can be used to instantiate an OrientGraph instance or
+ * obtain one through the pool. If you use OdbFilter and OdbSessionListener you should not need to use this class
+ * anywhere else.
  * 
  * @author Bruce Ashton
  * @date 2014-07-03
@@ -32,6 +34,8 @@ public class OdbPrincipal extends GenericPrincipal {
 
 
     /**
+     * Constructor.
+     * 
      * @param name The username of the user represented by this Principal
      * @param password Credentials used to authenticate this user
      * @param roles List of roles (must be Strings) possessed by this user
@@ -51,6 +55,8 @@ public class OdbPrincipal extends GenericPrincipal {
 
 
     /**
+     * Constructor.
+     * 
      * @param name The username of the user represented by this Principal
      * @param password Credentials used to authenticate this user
      * @param roles List of roles (must be Strings) possessed by this user
@@ -69,6 +75,8 @@ public class OdbPrincipal extends GenericPrincipal {
 
 
     /**
+     * Constructor.
+     * 
      * @param name The username of the user represented by this Principal
      * @param password Credentials used to authenticate this user
      * @param roles List of roles (must be Strings) possessed by this user
@@ -86,6 +94,8 @@ public class OdbPrincipal extends GenericPrincipal {
 
 
     /**
+     * Constructor.
+     * 
      * @param name The username of the user represented by this Principal
      * @param password Credentials used to authenticate this user
      * @param roles List of roles (must be Strings) possessed by this user
@@ -101,6 +111,11 @@ public class OdbPrincipal extends GenericPrincipal {
     }
 
 
+    /**
+     * Returns the URL of the OrientDB database.
+     * 
+     * @return the URL of the OrientDB database
+     */
     public String getDbUrl() {
         return dbUrl;
     }
