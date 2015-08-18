@@ -16,10 +16,29 @@ import com.ashtonit.odb.realm.OdbPrincipal;
 
 
 /**
- * This class cleans up old OrientGraph instance associated with a user when that user logs out.
+ * <p>
+ * Because OrientGraph instances always have an associated user, instances for a user who has logged out can clog up the
+ * OrientGraph pool. This class cleans up old OrientGraph instances associated with a user when that user logs out.
+ * </p>
+ * <p>
+ * The JNDI name of the pool must be set as a context parameter with the param name, "orientGraphPool", on the web
+ * application. Typically this is done with a context-param element in the web.xml file, e.g.
+ * </p>
+ * 
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;orientGraphPool&lt;/param-name&gt;
+ *     &lt;param-value&gt;odbp&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * This class also expects the principal instance to be an OdbPrincipal object , and set as an attribute on the session
+ * object. The name of the attribute is the class name of OdbPrincipal as returned by OdbPrincipal.class.getName(). If
+ * you use OdbFilter to set your graph object for each request, this requirement is automatically fulfilled.
+ * </p>
  * 
  * @author Bruce Ashton
- * @date 21/07/2015
+ * @date 2015-07-21
  */
 public class OdbSessionListener implements HttpSessionListener, ServletContextListener {
 
