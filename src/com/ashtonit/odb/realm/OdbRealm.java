@@ -26,7 +26,36 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 /**
  * A Tomcat Realm class for OrientDB graph databases.
- *
+ * <p>
+ * OdbRealm allows a web application to authenticate users against an embedded OrientDB database. Authentication is for
+ * actual database users, not just arbitrary records in the database.
+ * </p>
+ * <p>
+ * The <a href="https://tomcat.apache.org/tomcat-8.0-doc/config/realm.html" target="_blank">Tomcat guide on realm
+ * configuration is here</a>. Important things to note for OdbRealm configuration are:
+ * <ol>
+ * <li>The className attribute must have a value of "com.ashtonit.odb.realm.OdbRealm".</li>
+ * <li>The value of the dbUser attribute must be the name of a user with read access to the OUser class in the OrientDB
+ * database. The "reader" user works very well for this.</li>
+ * <li>The value of the dbResource attribute must match the value of the "name" attribute in your OdbResource
+ * configuration.</li>
+ * <li>The value of the dbUrl attribute must be a valid OrientDB URI.</li>
+ * <li>The realm uses a separate connection pool just for authenticating users. The pool size defaults to 64.</li>
+ * </ol>
+ * <p>
+ * An example of an OdbRealm definition would be:
+ * 
+ * <pre>
+ *   &lt;Realm
+ *     className="com.ashtonit.odb.realm.OdbRealm"
+ *     dbPass="reader"
+ *     dbResource="odbp"
+ *     dbUrl="plocal:/opt/odb/mygraphdb"
+ *     dbUser="reader"
+ *     poolSize="64"
+ *   /&gt;
+ * </pre>
+ * 
  * @author Bruce Ashton
  * @date 2014-06-22
  */
@@ -105,7 +134,9 @@ public class OdbRealm extends RealmBase {
 
 
     /**
-     * Authenticates a database user.
+     * Authenticates a database user. This is the only method of authentication (username and password) that this realm
+     * implementation supports. This is because of limitations imposed by the arguments needed to construct an
+     * OrientGraph instance - one of the arguments must be the password in plain text.
      *
      * @param username the username to authenticate
      * @param password the password associated with the username
@@ -195,8 +226,9 @@ public class OdbRealm extends RealmBase {
 
 
     /**
-     * Sets the name of an arbitrary database resource class that is never used, but that may need to be discovered via
-     * the JNDI service for initialisation purposes before any user queries are made.
+     * Sets the name of an arbitrary database resource class. The resource is never used, but may need to be discovered
+     * via the JNDI service to prompt some initialisation before any user queries are made. This is the case with the
+     * OdbResource OrientGraph pool.
      *
      * @param dbResource the JNDI name of the resource
      */
@@ -216,8 +248,8 @@ public class OdbRealm extends RealmBase {
 
 
     /**
-     * Sets the generic username to connect to the database with so that we can look up the principal. It only needs
-     * read permissions.
+     * Sets the generic username to connect to the database with so that we can look up the principal. It needs read
+     * permissions on the OUser class.
      *
      * @param dbUser the generic username to connect to the database
      */
@@ -227,7 +259,8 @@ public class OdbRealm extends RealmBase {
 
 
     /**
-     * Sets the database pool size.
+     * Sets the database pool size for the realm user only. This pool is only used for authentication. It has no effect
+     * on the OrientGraphPool instance that the web application will interact with.
      *
      * @param poolSize the database pool size
      */

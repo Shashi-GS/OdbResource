@@ -4,9 +4,9 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 
 /**
- * An OrientGraphPool instance maintains a pool of OrientGraph instances. A call to {@link get(String, String, String)}
+ * An OrientGraphPool instance maintains a pool of OrientGraph instances. A call to {@link #get(String, String, String)}
  * with url, username and password returns one to the caller. The caller releases the instance back to the pool by
- * calling {@link shutdown()} on the OrientGraph instance with no arguments.
+ * calling {@link #shutdown()} on the OrientGraph instance with no arguments.
  * <p>
  * Requires Java 1.7 or above.
  * </p>

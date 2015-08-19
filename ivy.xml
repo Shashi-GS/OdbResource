@@ -9,7 +9,7 @@
 	<info organisation="com.ashtonit" module="odbresource" status="integration">
 		<ivyauthor name="Ashton I T Ltd" url="http://www.ashtonit.com" />
 		<description homepage="http://www.ashtonit.com/odbresource.html">
-			Tested with Apache Tomcat 8.0.9
+			Tested with Apache Tomcat 8.0
 		</description>
 	</info>
 	<configurations>

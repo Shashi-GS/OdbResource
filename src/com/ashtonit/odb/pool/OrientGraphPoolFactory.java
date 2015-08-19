@@ -26,7 +26,7 @@ import com.orientechnologies.orient.server.OServerMain;
  * in the context.xml file of a web application or the server.xml file of a
  * Tomcat web application server or similar.
  * </p>
- * <table>
+ * <table summary="Parameters">
  * <thead>
  * <tr>
  * <th>Parameter</th>

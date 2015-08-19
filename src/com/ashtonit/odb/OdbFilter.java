@@ -49,8 +49,6 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
  *     &lt;param-value&gt;odbp&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
- * 
- * </p>
  *
  * @author Bruce Ashton
  * @date 2/07/2014
@@ -145,8 +143,6 @@ public class OdbFilter implements Filter {
      *     &lt;param-value&gt;odbp&lt;/param-value&gt;
      * &lt;/context-param&gt;
      * </pre>
-     * 
-     * </p>
      * 
      * @param config the container object for filter parameters
      * @see Filter#init(FilterConfig)

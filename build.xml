@@ -74,6 +74,7 @@
 	<target name="compile" depends="prepare,resolve,version">
 		<javac debug="${debug}" destdir="${classes}" includeAntRuntime="false" source="${source}" target="${target}">
 			<classpath refid="classpath" />
+		    <exclude name="**/package-info.java" />
 			<src path="${src}" />
 		</javac>
 	</target>
