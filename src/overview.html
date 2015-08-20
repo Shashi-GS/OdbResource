@@ -1,0 +1,12 @@
+<body>
+	<strong>OdbResource</strong> provides an OrientGraph pool
+	implementation a Tomcat realm implemenation for OrientDB and FIlter and
+	SessionListener classes to help manage OrientGraph instances in a web
+	application.
+	<p>The OrientGraph pool implementation works on the principal that
+		the web client users will correspond to database logins. This means
+		that OrientGraph instances in the pool have logins associated with
+		them. When an instance is retrieved from the pool it must have the
+		appropriate login associated with it. Hopefully future implementations
+		of the pool won't require this hack.</p>
+</body>

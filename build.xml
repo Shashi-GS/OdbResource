@@ -81,7 +81,7 @@
 
 
 	<target name="doc" depends="prepare,resolve,version">
-		<javadoc access="public" destdir="${api}" noqualifier="java.*" source="${source}">
+		<javadoc access="public" destdir="${api}" noqualifier="java.*" overview="${src}/overview.html" source="${source}">
 			<classpath refid="classpath" />
 			<link href="${api.javaee7}" />
 			<link href="${api.jdk8}" />
