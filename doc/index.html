@@ -304,6 +304,23 @@
                target="_blank">javadocs for the OrientGraphPoolFactory
               class</a>.
           </p>
+          <p>
+            Finally, to make the resource available to a given web application
+            you also must add it as a <strong>Resource Link</strong> in the web
+            app's <strong>context.xml</strong>. An example context.xml would
+            be:
+            <pre>
+              &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+              &lt;Context&gt;
+	        &lt;ResourceLink global="odbp" name="odbp"
+                                 type="com.ashtonit.odb.pool.OrientGraphPool"&gt;
+	        &lt;/ResourceLink&gt;
+              &lt;/Context&gt;
+            </pre>
+            The <a href="https://tomcat.apache.org/tomcat-8.0-doc/jndi-resources-howto.html"
+                           target="_blank">Tomcat guide on JNDI resource
+              configuration is here</a>.
+          </p>
 
           <h4>OdbRealm</h4>
           <p>
@@ -315,8 +332,11 @@
           <p>
             The <a href="https://tomcat.apache.org/tomcat-8.0-doc/config/realm.html"
                            target="_blank">Tomcat guide on realm configuration
-              is here</a>. Important things to note for OdbRealm configuration
-            are:
+              is here</a>. See the
+            <a href="api/com/ashtonit/odb/realm/OdbRealm.html"
+               target="_blank">API documentation</a> for OdbRealm for more
+            information on this specific implementation. Important things to
+            note for OdbRealm configuration are:
             <ol>
               <li>
                 The className attribute must have a value of
@@ -349,7 +369,14 @@
             </pre>
           </p>
           <p>
-            <em><strong>TODO</strong> Discussion of OdbPrincipal here...</em>
+            The <a href="http://docs.oracle.com/javase/8/docs/api/java/security/Principal.html"
+                   target="_blank">Principal</a> implementation used by
+            OdbRealm is <a href="api/com/ashtonit/odb/realm/OdbPrincipal.html"
+                           target="_blank">OdbPrincipal</a>. If you want to
+            look up an OrientGraph instance directly from a JNDI context in
+            your web application you can cast the principal to OdbPrincipal and
+            then obtain the OrientDB URL as well as the username and password.
+            See the servlet example just below.
           </p>
         </div>
         <h3>A Servlet Example</h3>
@@ -370,7 +397,9 @@
 
                     OrientGraph graph = null;
                     try {
-                        graph = pool.get(principal.getDbUrl(), principal.getName(), principal.getPassword());
+                        graph = pool.get(principal.getDbUrl(),
+                                         principal.getName(),
+                                         principal.getPassword());
 
                         OrientVertex vertex = graph.getVertex("myVertexKey");
 	                out.println("&lt;html&gt;");
@@ -393,21 +422,106 @@
           This allows multiple databases, each defined by a different realm.
           The OdbResource configuration defines the server, not the database.
         </p>
-          <p>
-            <em><strong>TODO</strong> Resource ref in web.xml</em>
-          </p>
+        <h3>A Filter and SessionListener Example</h3>
         <p>
-          Here endeth the user guide :)
+          A better way to obtain and release OrientGraph instances from the
+          pool is by using <strong>OdbFilter</strong> and
+          <strong>OdbSessionListener</strong>.
+        </p>
+        <p>
+          OdbFilter gets an OrientGraph instance using the session principal
+          sets it as a request attribute. It also calls shutdown to release the
+          instance at the end of the request.
+        </p>
+        <p>
+          OdbSessionListener cleans up all OrientGraph instances associated
+          with the principal when the session ends. It is necessary because of
+          a fundamental limitation of this pool implementation. That is, all
+          OrientGraph instances are immutably linked to a user's credentials.
+          This is discussed in more detail
+          <a href="whitepaper.html">elsewhere</a>.
+        </p>
+        <p>
+          OdbFilter is configured in <strong>web.xml</strong>. It requires the
+          following elements:
+          <pre>
+            &lt;context-param&gt;
+              &lt;param-name&gt;orientGraph&lt;/param-name&gt;
+              &lt;param-value&gt;graph&lt;/param-value&gt;
+            &lt;/context-param&gt;
+
+            &lt;context-param&gt;
+              &lt;param-name&gt;orientGraphPool&lt;/param-name&gt;
+              &lt;param-value&gt;odbp&lt;/param-value&gt;
+            &lt;/context-param&gt;
+
+	    &lt;filter&gt;
+	      &lt;filter-name&gt;odbFilter&lt;/filter-name&gt;
+	      &lt;filter-class&gt;com.ashtonit.odb.OdbFilter&lt;/filter-class&gt;
+	    &lt;/filter&gt;
+
+	    &lt;filter-mapping&gt;
+	      &lt;filter-name&gt;odbFilter&lt;/filter-name&gt;
+	      &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+	    &lt;/filter-mapping&gt;
+          </pre>
+          The param-value and filter-name elements have example values only.
+          See the <a href="api/com/ashtonit/odb/OdbFilter.html"
+                     target="_blank">API documentation</a> for OdbFilter for
+          more detail.
+        </p>
+        <p>
+          OdbSessionListener is configured in <strong>web.xml</strong> with a
+          single element as follows:
+          <pre>
+	    &lt;listener&gt;
+	      &lt;listener-class&gt;com.ashtonit.odb.OdbSessionListener&lt;/listener-class&gt;
+	    &lt;/listener&gt;
+          </pre>
+          It also depends on the same <strong>orientGraphPool</strong> context
+          param that OdbFilter requires. See the
+          <a href="api/com/ashtonit/odb/OdbSessionListener.html"
+             target="_blank">API documentation</a> for OdbSessionListener for
+          more detail.
+        </p>
+        <p>
+          After this, the servlet example becomes:
+          <pre>
+            public class MyServlet extends HttpServlet {
+
+                public void service(HttpServletRequest request, HttpServletResponse response)
+                  throws ServletException, IOException {
+
+                    OrientGraph graph = null;
+                    try {
+                        graph = request.getAttribute("graph");
+
+                        OrientVertex vertex = graph.getVertex("myVertexKey");
+	                out.println("&lt;html&gt;");
+	                out.println("&lt;body&gt;");
+		        out.println("&lt;h1&gt;");
+                        out.println(vertex.toString());
+		        out.println("&lt;/h1&gt;");
+		        out.println("&lt;/body&gt;");
+	                out.println("&lt;/html&gt;");
+	
+                    } finally {
+                        if (graph != null && !graph.isClosed()) {
+                            graph.shutdown();
+                        }
+                    }
+                }
+            }
+          </pre>
         </p>
       </div>
+        <p>
+          Here endeth the user guide.
+        </p>
     </div>
 
     <div>
       <hr class="divider"/>
-    </div>
-    
-    <div class="footer">
-      &copy; Copyright Bruce Ashton 2015
     </div>
   </body>
 </html>

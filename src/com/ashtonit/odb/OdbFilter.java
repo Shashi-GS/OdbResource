@@ -23,17 +23,18 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 /**
  * <p>
  * This class is responsible for obtaining an {@link OrientGraph} instance from {@link OrientGraphPool} and setting it
- * as an attribute on the session object.
+ * as an attribute on the request object.
  * </p>
  * <p>
  * It pulls two context parameters from the servlet context;
  * </p>
  * <p>
- * <strong>orientGraph</strong> is used to set the name of the session attribute that will contain the instance of
+ * <strong>orientGraph</strong> is used to set the name of the request attribute that will contain the instance of
  * {@link OrientGraph} as its value.
  * </p>
  * <p>
- * <strong>orientGraphPool</strong> sets the JNDI name of the graph database pool instance relative to, "java:comp/env".
+ * <strong>orientGraphPool</strong> tells this OdbFilter instance the JNDI name of the graph database pool instance
+ * relative to, "java:comp/env". It must match your resource configuration.
  * </p>
  * <p>
  * Both of these values can be configured in the web.xml file with a context-param element, as below;
