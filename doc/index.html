@@ -492,24 +492,16 @@
                 public void service(HttpServletRequest request, HttpServletResponse response)
                   throws ServletException, IOException {
 
-                    OrientGraph graph = null;
-                    try {
-                        graph = request.getAttribute("graph");
+                    OrientGraph graph = graph = request.getAttribute("graph");
 
-                        OrientVertex vertex = graph.getVertex("myVertexKey");
-	                out.println("&lt;html&gt;");
-	                out.println("&lt;body&gt;");
-		        out.println("&lt;h1&gt;");
-                        out.println(vertex.toString());
-		        out.println("&lt;/h1&gt;");
-		        out.println("&lt;/body&gt;");
-	                out.println("&lt;/html&gt;");
-	
-                    } finally {
-                        if (graph != null && !graph.isClosed()) {
-                            graph.shutdown();
-                        }
-                    }
+                    OrientVertex vertex = graph.getVertex("myVertexKey");
+	            out.println("&lt;html&gt;");
+	            out.println("&lt;body&gt;");
+		    out.println("&lt;h1&gt;");
+                    out.println(vertex.toString());
+		    out.println("&lt;/h1&gt;");
+		    out.println("&lt;/body&gt;");
+	            out.println("&lt;/html&gt;");
                 }
             }
           </pre>
