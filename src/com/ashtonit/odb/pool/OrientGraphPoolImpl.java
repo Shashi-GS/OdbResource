@@ -18,7 +18,7 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
  * @author Bruce Ashton
  * @date 2015-05-23
  */
-class OrientGraphPoolImpl implements OrientGraphPool {
+public class OrientGraphPoolImpl implements OrientGraphPool {
 
     private static final Logger log = Logger.getLogger(OrientGraphPoolImpl.class.getName());
 
