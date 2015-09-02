@@ -36,7 +36,7 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
  * <ol>
  * <li>The className attribute must have a value of "com.ashtonit.odb.realm.OdbRealm".</li>
  * <li>The value of the dbUser attribute must be the name of a user with read access to the OUser class in the OrientDB
- * database. The "reader" user works very well for this.</li>
+ * database. The "admin" user can be used for this for development and testing purposes.</li>
  * <li>The value of the dbResource attribute must match the value of the "name" attribute in your OdbResource
  * configuration.</li>
  * <li>The value of the dbUrl attribute must be a valid OrientDB URI.</li>
@@ -48,10 +48,10 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
  * <pre>
  *   &lt;Realm
  *     className="com.ashtonit.odb.realm.OdbRealm"
- *     dbPass="reader"
+ *     dbPass="admin"
  *     dbResource="odbp"
  *     dbUrl="plocal:/opt/odb/mygraphdb"
- *     dbUser="reader"
+ *     dbUser="admin"
  *     poolSize="64"
  *   /&gt;
  * </pre>
