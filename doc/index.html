@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>OdbResource and OdbRealm</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Bruce Ashton">
+    <meta name="description" content="How to use the OdbResource and OrientGraphPool libraries">
+    <style type="text/css"><!--
+      body {
+        font-family: Helvetica, sans-serif;
+        font-size: 12pt;
+        margin-left: 5px;
+        margin-right: 5px;
+        margin-top: 0px;
+        margin-bottom: 0px;
+        text-align: center;
+      }
+
+      a {
+        text-decoration: none;
+        color: #0d528b;
+      }
+
+      a:visited {
+        color: #88a5cb;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      pre {
+        background-color: #FFF8E7;
+        border-color: #a7a6a6;
+        border-style: solid;
+        border-width: 1px;
+        font-size: 10pt;
+        padding-top: 1em;
+      }
+
+      table {
+        border-collapse: collapse;
+        font-size: 12pt;
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+      }
+
+      td {
+        border-style: solid;
+        border-width: 1px;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        border-style: solid;
+        border-width: 1px;
+        font-weight: bold;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        text-align: left;
+        vertical-align: center;
+      }
+
+      .title {
+        margin: 10px;
+        padding: 10px;
+      }
+
+      .content {
+        font-size: 12pt;
+        margin-left: 25px;
+        margin-right: 25px;
+        padding-left: 10px;
+        padding-right: 10px;
+        text-align: justify;
+      }
+
+      .divider {
+        background-color: #0d528b;
+        color: #0d528b;
+        height: 1px;
+        margin: 25px;
+        border: 1px;
+        padding: 1px;
+      }
+
+      .logln {
+        font-size: 12pt;
+        font-weight: bold;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding: 10px;
+      }
+
+      .menu {
+        white-space: nowrap;
+      }
+
+      .mitem {
+        font-style: italic;
+        font-weight: bold;
+        padding: 5px;
+        white-space: nowrap;
+      }
+
+      .sitem {
+        color: #a7a6a6;
+        font-weight: bold;
+        padding: 5px;
+        white-space: nowrap;
+      }
+
+      .footer {
+        font-size: 8pt;
+        font-weight: bold;
+        white-space: nowrap;
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+      }
+
+      .noframe {
+        border-style: none;
+        padding: 3px;
+        white-space: nowrap;
+      }
+    --></style>
+  </head>
+  <body>
+    <h1>OdbResource and OdbRealm</h1>
+    <div>
+      <hr class="divider"/>
+    </div>
+
+    <h2>Useful Links</h2>
+    <p>
+      <strong><a href="api/index.html">OdbResource and OdbRealm Javadocs</a></strong>
+    </p>
+    <p>
+      <a href="http://orientdb.com/docs/last/">OrientDB Manual</a>
+    </p>
+    <p>
+      <a href="http://tomcat.apache.org/tomcat-8.0-doc/index.html">Apache Tomcat 8 Documentation</a>
+    </p>
+    <p>
+      <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>
+    </p>
+    <div>
+      <hr class="divider"/>
+    </div>
+
+    <h2>Introduction</h2>
+    <div class="content">
+      <p>
+        <a href="http://orientdb.com/">OrientDB</a> was a product that I
+        stumbled across a year or two ago. I instantly fell in love with what
+        they were trying to do. A graph database with features of
+        document-oriented databases that could run standalone or embedded. ACID
+        transactions, multi-master replication and record level security!
+      </p>
+      <p>
+        The only reasons I could imagine why more people weren't using were:
+        <ol>
+          <li>
+            It was very new.
+          </li>
+          <li>
+            Graph databases represent a paradigm shift and therefore a steep
+            learning curve compared with most other databases.
+          </li>
+        </ol>
+      </p>
+      <p>
+        After playing around with it for a short time, I saw the possibility of
+        using it for web applications in a way that would improve security
+        while simultaneously removing some of the boilerplate that usually has
+        to be written. But there were some issues, mostly because OrientDB's
+        connection pooling hadn't been designed with this architecture in mind.
+      </p>
+      <p>
+        OdbResource is not so much a solution to these issues as a proof of
+        concept for an architecture. It is an implementation of a pool for
+        OrientGraph instances that can be bound to a JNDI service and comes
+        with OdbRealm, an OrientDB realm for Tomcat. It is far from an ideal
+        implementation though, for reasons discussed
+        <a href="whitepaper.html">elsewhere</a>.
+      </p>
+    </div>
+    <div>
+      <hr class="divider"/>
+    </div>
+
+    <h2>User Guide</h2>
+    <div class="content">
+      <p>
+        This guide covers the use of OdbResource and OdbRealm with Tomcat.
+      </p>
+
+      <div class="content">
+        <h3>Download and Install</h3>
+        <p>
+          <ol>
+            <li>
+              Download the latest binary release from the
+              <a href="https://github.com/skwidge/OdbResource/releases/"
+                 target="_blank">OdbResource release page on Github</a>. Or
+              download the source and build the <strong>dist</strong> target
+              with ant.
+            </li>
+            <li>
+              Unzip the file odbresource-[<em>version number</em>].zip in the lib
+              directory of Apache Tomcat.
+            </li>
+          </ol>
+        </p>
+
+        <h3>Configuration</h3>
+        <p>
+          There are two components that have to be configured at either the
+          context or server level. (context.xml or server.xml) They are the
+          Resource and the Realm.
+        </p>
+
+        <div class="content">
+          <h4>OdbResource</h4>
+          <p>
+            The OrientGraphPoolFactory class must be configured as a JNDI
+            Resource in Tomcat. This must be done in either server.xml or the
+            context.xml file for the web application.
+          </p>
+          <p>
+            Putting the configuration in server.xml is generally more
+            appropriate. The OServer instance runs as a singleton anyway so the
+            configuration is effectively global wherever you put it. Two
+            different configurations in different context.xml files would
+            result in undefined behaviour. Most likely the first application to
+            be loaded would override any others.
+          </p>
+          <p>
+            The <a href="https://tomcat.apache.org/tomcat-8.0-doc/config/context.html#Resource_Definitions"
+                   target="_blank">Tomcat
+              guide on resource configuration is here</a>. Important things to
+            note for OdbResource configuration are:
+            <ol>
+              <li>
+                The auth attribute must have a value of "Container".
+              </li>
+              <li>
+                The closeMethod attribute must have a value of "shutdown".
+              </li>
+              <li>
+                The factory attribute must have a value of
+                "com.ashtonit.odb.pool.OrientGraphPoolFactory".
+              </li>
+              <li>
+                The type attribute must have a value of
+                "com.ashtonit.odb.pool.OrientGraphPool".
+              </li>
+              <li>
+                The singleton attribute must have a value of true, to ensure
+                that the close method is run. (In fact the OrientGraphPool
+                remains a singleton regardless of this attribute.)
+              </li>
+            </ol>
+          </p>
+          <p>
+            An example of a minimal OdbResource definition would be:
+            <pre>
+              &lt;Resource
+                 auth="Container"
+                 closeMethod="shutdown"
+                 configFile="/opt/orientdb-community-2.1/config/orientdb-server-config.xml"
+                 factory="com.ashtonit.odb.pool.OrientGraphPoolFactory"
+                 name="odbp"
+                 singleton="true"
+                 type="com.ashtonit.odb.pool.OrientGraphPool"
+               /&gt;
+            </pre>
+            The only attribute in the above element that is not described in the
+            Tomcat configuration guide is <strong>configFile</strong>. The value
+            should be the name of the OrientDB server configuration file. Refer
+            to the OrientDB manual if you edit this file. I have generally left
+            it untouched.
+          </p>
+          <p>
+            A complete OdbResource definition with all optional attributes is:
+            <pre>
+              &lt;Resource
+                 auth="Container"
+                 closeMethod="shutdown"
+                 configFile="/opt/orientdb-community-2.1/config/orientdb-server-config.xml"
+                 factory="com.ashtonit.odb.pool.OrientGraphPoolFactory"
+                 name="odbp"
+                 singleton="true"
+                 type="com.ashtonit.odb.pool.OrientGraphPool"
+                 commitOnShutdown="true"
+                 getWait="1000"
+                 perUserLimit="10"
+                 recycleCount="3"
+                 timeOut="10000"
+                 totalLimit="1000"
+               /&gt;
+            </pre>
+            An explanation of all the optional attributes above can be found in
+            the description of configuration parameters in the
+            <a href="file:///mnt/share/code/OdbResource/doc/api/com/ashtonit/odb/pool/OrientGraphPoolFactory.html"
+               target="_blank">javadocs for the OrientGraphPoolFactory
+              class</a>.
+          </p>
+          <p>
+            Finally, to make the resource available to a given web application
+            you also must add it as a <strong>Resource Link</strong> in the web
+            app's <strong>context.xml</strong>. An example context.xml would
+            be:
+            <pre>
+              &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+              &lt;Context&gt;
+	        &lt;ResourceLink global="odbp" name="odbp"
+                                 type="com.ashtonit.odb.pool.OrientGraphPool"&gt;
+	        &lt;/ResourceLink&gt;
+              &lt;/Context&gt;
+            </pre>
+            The <a href="https://tomcat.apache.org/tomcat-8.0-doc/jndi-resources-howto.html"
+                           target="_blank">Tomcat guide on JNDI resource
+              configuration is here</a>.
+          </p>
+
+          <h4>OdbRealm</h4>
+          <p>
+            This is a fairly simple and restricted authentication Realm for
+            Tomcat. It only supports one form of authentication, the basic
+            username/password method. Attempting to use any other method will
+            result in an <em>UnsupportedOperationException</em>.
+          </p>
+          <p>
+            The <a href="https://tomcat.apache.org/tomcat-8.0-doc/config/realm.html"
+                           target="_blank">Tomcat guide on realm configuration
+              is here</a>. See the
+            <a href="api/com/ashtonit/odb/realm/OdbRealm.html"
+               target="_blank">API documentation</a> for OdbRealm for more
+            information on this specific implementation. Important things to
+            note for OdbRealm configuration are:
+            <ol>
+              <li>
+                The className attribute must have a value of
+                "com.ashtonit.odb.realm.OdbRealm".
+              </li>
+              <li>
+                The value of the dbUser attribute must be the name of a user
+                with read access to the OUser class in the OrientDB database.
+                The "admin" user can be used for this for development and
+                testing purposes.
+              </li>
+              <li>
+                The value of the dbResource attribute must match the value of
+                the "name" attribute in your OdbResource configuration.
+              </li>
+              <li>
+                The value of the dbUrl attribute must be a valid OrientDB URI.
+              </li>
+            </ol>
+          </p>
+          <p>
+            An example of an OdbRealm definition would be:
+            <pre>
+              &lt;Realm
+                className="com.ashtonit.odb.realm.OdbRealm"
+                dbPass="admin"
+                dbResource="odbp"
+                dbUrl="plocal:/opt/odb/mygraphdb"
+                dbUser="admin"
+              /&gt;
+            </pre>
+          </p>
+          <p>
+            The <a href="http://docs.oracle.com/javase/8/docs/api/java/security/Principal.html"
+                   target="_blank">Principal</a> implementation used by
+            OdbRealm is <a href="api/com/ashtonit/odb/realm/OdbPrincipal.html"
+                           target="_blank">OdbPrincipal</a>. If you want to
+            look up an OrientGraph instance directly from a JNDI context in
+            your web application you can cast the principal to OdbPrincipal and
+            then obtain the OrientDB URL as well as the username and password.
+            See the servlet example just below.
+          </p>
+        </div>
+        <h3>A Servlet Example</h3>
+        <p>
+          Here we have a simple example showing how to look up the graph
+          database pool in the JNDI context, obtain and use an OrientGraph
+          instance and release it again.
+          <pre>
+            public class MyServlet extends HttpServlet {
+
+                public void service(HttpServletRequest request, HttpServletResponse response)
+                  throws ServletException, IOException {
+
+                    Context initCtx = new InitialContext();
+                    Context envCtx = (Context) initCtx.lookup("java:comp/env");
+                    OrientGraphPool pool = (OrientGraphPool) envCtx.lookup("odbp");
+                    OdbPrincipal principal = (OdbPrincipal) httpRequest.getUserPrincipal();
+
+                    OrientGraph graph = null;
+                    try {
+                        graph = pool.get(principal.getDbUrl(),
+                                         principal.getName(),
+                                         principal.getPassword());
+
+                        OrientVertex vertex = graph.getVertex("myVertexKey");
+	                out.println("&lt;html&gt;");
+	                out.println("&lt;body&gt;");
+		        out.println("&lt;h1&gt;");
+                        out.println(vertex.toString());
+		        out.println("&lt;/h1&gt;");
+		        out.println("&lt;/body&gt;");
+	                out.println("&lt;/html&gt;");
+	
+                    } finally {
+                        if (graph != null && !graph.isClosed()) {
+                            graph.shutdown();
+                        }
+                    }
+                }
+            }
+          </pre>
+          You may notice that the database URI is obtained from the principal.
+          This allows multiple databases, each defined by a different realm.
+          The OdbResource configuration defines the server, not the database.
+        </p>
+        <h3>A Filter and SessionListener Example</h3>
+        <p>
+          A better way to obtain and release OrientGraph instances from the
+          pool is by using <strong>OdbFilter</strong> and
+          <strong>OdbSessionListener</strong>.
+        </p>
+        <p>
+          OdbFilter gets an OrientGraph instance using the session principal
+          sets it as a request attribute. It also calls shutdown to release the
+          instance at the end of the request.
+        </p>
+        <p>
+          OdbSessionListener cleans up all OrientGraph instances associated
+          with the principal when the session ends. It is necessary because of
+          a fundamental limitation of this pool implementation. That is, all
+          OrientGraph instances are immutably linked to a user's credentials.
+          This is discussed in more detail
+          <a href="whitepaper.html">elsewhere</a>.
+        </p>
+        <p>
+          OdbFilter is configured in <strong>web.xml</strong>. It requires the
+          following elements:
+          <pre>
+            &lt;context-param&gt;
+              &lt;param-name&gt;orientGraph&lt;/param-name&gt;
+              &lt;param-value&gt;graph&lt;/param-value&gt;
+            &lt;/context-param&gt;
+
+            &lt;context-param&gt;
+              &lt;param-name&gt;orientGraphPool&lt;/param-name&gt;
+              &lt;param-value&gt;odbp&lt;/param-value&gt;
+            &lt;/context-param&gt;
+
+	    &lt;filter&gt;
+	      &lt;filter-name&gt;odbFilter&lt;/filter-name&gt;
+	      &lt;filter-class&gt;com.ashtonit.odb.OdbFilter&lt;/filter-class&gt;
+	    &lt;/filter&gt;
+
+	    &lt;filter-mapping&gt;
+	      &lt;filter-name&gt;odbFilter&lt;/filter-name&gt;
+	      &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+	    &lt;/filter-mapping&gt;
+          </pre>
+          The param-value and filter-name elements have example values only.
+          See the <a href="api/com/ashtonit/odb/OdbFilter.html"
+                     target="_blank">API documentation</a> for OdbFilter for
+          more detail.
+        </p>
+        <p>
+          OdbSessionListener is configured in <strong>web.xml</strong> with a
+          single element as follows:
+          <pre>
+	    &lt;listener&gt;
+	      &lt;listener-class&gt;com.ashtonit.odb.OdbSessionListener&lt;/listener-class&gt;
+	    &lt;/listener&gt;
+          </pre>
+          It also depends on the same <strong>orientGraphPool</strong> context
+          param that OdbFilter requires. See the
+          <a href="api/com/ashtonit/odb/OdbSessionListener.html"
+             target="_blank">API documentation</a> for OdbSessionListener for
+          more detail.
+        </p>
+        <p>
+          After this, the servlet example becomes:
+          <pre>
+            public class MyServlet extends HttpServlet {
+
+                public void service(HttpServletRequest request, HttpServletResponse response)
+                  throws ServletException, IOException {
+
+                    OrientGraph graph = graph = request.getAttribute("graph");
+
+                    OrientVertex vertex = graph.getVertex("myVertexKey");
+	            out.println("&lt;html&gt;");
+	            out.println("&lt;body&gt;");
+		    out.println("&lt;h1&gt;");
+                    out.println(vertex.toString());
+		    out.println("&lt;/h1&gt;");
+		    out.println("&lt;/body&gt;");
+	            out.println("&lt;/html&gt;");
+                }
+            }
+          </pre>
+        </p>
+      </div>
+        <p>
+          Here endeth the user guide.
+        </p>
+    </div>
+
+    <div>
+      <hr class="divider"/>
+    </div>
+  </body>
+</html>
