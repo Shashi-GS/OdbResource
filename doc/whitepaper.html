@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>More Secure Web Applications with OrientDB</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Bruce Ashton">
+    <meta name="description" content="Discussion of a proposed architecture for Java web applications with an embedded
+                                      OrientDB graph database">
+    <style type="text/css"><!--
+      body {
+        font-family: Helvetica, sans-serif;
+        font-size: 12pt;
+        margin-left: 2em;
+        margin-right: 2em;
+        margin-top: 0em;
+        margin-bottom: 0em;
+        text-align: justify;
+      }
+
+      a {
+        text-decoration: none;
+        color: #0d528b;
+      }
+
+      a:visited {
+        color: #88a5cb;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      pre {
+        border-style: solid;
+        border-width: 1px;
+      }
+
+      img {
+        display: block;
+        margin: auto;
+      }
+
+      table {
+        border-collapse: collapse;
+        font-size: 12pt;
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+      }
+
+      td {
+        border-style: solid;
+        border-width: 1px;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        border-style: solid;
+        border-width: 1px;
+        font-weight: bold;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        text-align: left;
+        vertical-align: center;
+      }
+
+      .title {
+        margin: 10px;
+        padding: 10px;
+      }
+
+      .content {
+        font-size: 12pt;
+        margin-left: 25px;
+        margin-right: 25px;
+        padding-left: 10px;
+        padding-right: 10px;
+        text-align: justify;
+      }
+
+      .divider {
+        background-color: #0d528b;
+        color: #0d528b;
+        height: 1px;
+        margin: 25px;
+        border: 1px;
+        padding: 1px;
+      }
+
+      .logln {
+        font-size: 12pt;
+        font-weight: bold;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding: 10px;
+      }
+
+      .menu {
+        white-space: nowrap;
+      }
+
+      .mitem {
+        font-style: italic;
+        font-weight: bold;
+        padding: 5px;
+        white-space: nowrap;
+      }
+
+      .sitem {
+        color: #a7a6a6;
+        font-weight: bold;
+        padding: 5px;
+        white-space: nowrap;
+      }
+
+      .footer {
+        font-size: 8pt;
+        font-weight: bold;
+        white-space: nowrap;
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+      }
+
+      .noframe {
+        border-style: none;
+        padding: 3px;
+        white-space: nowrap;
+      }
+    --></style>
+  </head>
+  <body>
+    <h1>More Secure Web Applications with OrientDB</h1>
+    <p>
+      Author: Bruce Ashton<br/>
+      Date: 2015-07-25
+    </p>
+    <div>
+      <h2>Introduction</h2>
+      <p>
+        <a href="http://orientdb.com/orientdb/" target="_blank">OrientDB</a> is a relatively new
+        <a href="http://en.wikipedia.org/wiki/Graph_database" target="_blank">graph database</a> with features of
+        <a href="http://en.wikipedia.org/wiki/Document-oriented_database" target="_blank">document-oriented</a> and
+        <a href="http://en.wikipedia.org/wiki/Object_database" target="_blank">object databases</a> as well. Despite a
+        handful of <a href="http://orientdb.com/customers/" target="_blank">big name customers</a> and one or two other
+        <a href="https://www.gartner.com/doc/2610218" target="_blank">interesting claims to fame</a>, most people I've
+        talked to haven't heard of it yet.
+      </p>
+      <p>
+        Three of its features are of particular interest though:
+        <ol>
+          <li>
+            <a href="http://orientdb.com/orientdb-supports-the-new-record-level-security/" target="_blank">Record level
+              security</a>. (See also
+            <a href="http://orientdb.com/docs/last/Database-Security.html#record-level-security" target="_blank">here</a>.)
+            Follow the links for a full explanation, but essentially it means a record created by one user can only be
+            read or written by that user by default.
+          </li>
+          <li>
+            <a href="http://orientdb.com/docs/last/Inheritance.html" target="_blank">The flexible inheritance model</a>,
+            that means any record or class (these two things are essentially the same) can be altered to extend any
+            other - including vertices and edges in the graph.
+          </li>
+          <li>
+            <a href="http://orientdb.com/docs/last/Security.html" target="_blank">Users and roles</a> are just classes
+            like any other record and can be manipulated in exactly the same way as an other class in the database.
+          </li>
+        </ol>
+      </p>
+      <p>
+        Put together, these three features allow a model for web applications where the database mitigates
+        <a href="https://www.owasp.org/index.php/Top_10_2013-A4-Insecure_Direct_Object_References" target="_blank">a
+          common web security issue</a> for free and helps to manage a
+        <a href="https://www.owasp.org/index.php/Top_10_2013-A2-Broken_Authentication_and_Session_Management" target="_blank">couple</a>
+        of
+        <a href="https://www.owasp.org/index.php/Top_10_2013-A7-Missing_Function_Level_Access_Control" target="_blank">others</a>.
+      </p>
+      <p>
+        This document and <a href="https://github.com/skwidge/OdbResource" target="_blank">the associated code</a>
+        illustrate how this can work.
+      </p>
+      <h3>Caveat</h3>
+      <p>
+        OrientDB as it currently exists does not quite support the proposed architecture at scale. There are one or two
+        problems to solve which are discussed at the end of this document.
+      </p>
+    </div>
+    <div>
+      <h2>The OrientDB Security Model</h2>
+      <p>
+        OrientDB uses the traditional user/role-with-permissions security model. As noted above though, users and roles
+        are both classes like any other record and can be manipulated in the same way.
+      </p>
+      <p>
+        As a quick summary; A user record corresponds to login. Users and roles have a many-to-many relationship.
+        Permissions are specified as some combination of create, read, update and delete. Roles have permissions over
+        database resources. Resources are defined at many levels, from database down to record. For a full explanation
+        of the OrientDB security model,
+        <a href="http://orientdb.com/docs/last/Database-Security.html" target="_blank">go to the manual</a>.
+      </p>
+      <h3>Record Level Security</h3>
+      <p>
+        <a href="http://orientdb.com/docs/last/Database-Security.html#record-level-security" target="_blank">Record
+          level security</a> is implemented slightly differently to other levels. It can be applied to records only if
+        they are members of classes that extend ORestricted. To apply this to the nodes and edges of a graph database
+        that means you must alter the V (vertex) and E (edge) classes to extend ORestricted.
+      </p>
+      <p>
+        Instances of ORestricted (and its sub-classes) inherit four properties, _allow, allowRead, _allowUpdate and
+        _allowDelete. These properties contain collections of  OrientDB roles and/or users that can apply the given
+        operation to that record. Orient adds a hook to the record that is checked before every CRUD operation.
+      </p>
+      <p>
+        The default is to allow the only user creating the record access to any operations on it. This behaviour can be
+        customised with the <a href="http://orientdb.com/docs/last/Hook.html" target="_blank">onCreate hook</a>.
+      </p>
+      <p>
+        Roles can be given the ability to bypass record level security constraints using the special,
+        "database.bypassRestricted" permission. This permission cannot be inherited.
+      </p>
+    </div>
+    <div>
+      <h2>A Graph User Model</h2>
+      <p>
+        There are six classes that are of interest to us when defining the user model in an OrientDB graph database.
+        The classes and their relationships in a freshly created graph database are shown below. As you can see OUser
+        and ORole both extend OIdentity, but none of the other classes have any particular relationship.
+      </p>
+      <img src="image/diagram1.png" />
+      <p>
+        OUser and ORole must extend OIdentity, in order to be part of the OrientDB security model. But wouldn't it be
+        useful if our users could part of a graph? The easiest way to achieve this is to let OIdentity extend V. Now
+        Our users can also be nodes in a graph.
+      </p>
+      <p>
+        Just as a note, OrientDB versions 2.1 and later allow multiple inheritance, which would allow OUser or ORole to
+        extend both OIdentity and V. This would allow more flexibility in how one structures this.
+      </p>
+      <p>
+        We also would like to apply record level security  to all the elements of our graph, including the users. We can
+        do this by letting V, and possibly also E, extend ORestricted,
+        <a href="http://orientdb.com/docs/last/Database-Security.html#record-level-security" target="_blank">as
+          recommended in the manual</a>. Now our class diagram looks like this:
+      </p>
+      <img src="image/diagram2.png" />
+      <h3>The Benefits</h3>
+      <p>
+        At this point database users are first class citizens of our graph and can be queried like any other graph
+        component. The records they create (including new roles and users) can be governed by record level security.
+      </p>
+      <p>
+        Now let's say we create a web application that allows users to sign up and log in. We still need to write the
+        user interface for these functions, but we no longer have to develop a user model, permissions model, etc. We
+        get these for free.
+      </p>
+      <p>
+        Any new records created by a user are only available to that user by default, so long as we ensure those records
+        extend ORestricted. If we want to make the records more generally available we must do so explicitly either by
+        policy or specific action. New restricted records are created secure by default.
+      </p>
+      <p>
+        This directly mitigates the risk of one of the most common web application vulnerabilities -
+        <a href="https://www.owasp.org/index.php/Top_10_2013-A4-Insecure_Direct_Object_References" target="_blank">insecure
+          direct object references</a>. Every reference to a vertex or edge in our graph gets access checked for free.
+      </p>
+      <p>
+        It indirectly mitigates some of the risk of
+        <a href="https://www.owasp.org/index.php/Top_10_2013-A2-Broken_Authentication_and_Session_Management" target="_blank">broken
+          authentication and session management</a>, in as much as it allows this functionality to be delegated to the
+        database. Authentication is handled directly by the database. Session management remains the responsibility of
+        the web application, but this can be delegated to the container. Using OdbRealm and OdbResource, authentication
+        and session management become a task of configuration rather than coding.
+      </p>
+      <p>
+        There is a significant non-security related benefit here as well. Developers still get tasked with writing
+        boilerplate authentication and authorisation management code for far too many web applications. Having this
+        provided is a real timesaver.
+      </p>
+      <p>
+        It potentially mitigates some of the risk of
+        <a href="https://www.owasp.org/index.php/Top_10_2013-A7-Missing_Function_Level_Access_Control" target="_blank">missing
+          function level access control</a>. It does this by protecting access to the underlying data. For example, a
+        blog user might have write access to their own posts but only read access to another user's posts. A malicious
+        user might find a way to invoke edit functionality on another user's blog, but the edit would still fail because
+        of access checks.
+      </p>
+      <h3>The Risks</h3>
+      <p>
+        There is a flip-side to making all your users database users. An OrientDB database engine usually listens on a
+        couple of ports and a malicious user could potentially log in on any of them and execute arbitrary queries, if
+        they were to gain network access and the credentials of any user. The queries would still be governed by the
+        same security model though, and sensible firewall, network and database configuration should provide sufficient
+        protection from this.
+      </p>
+    </div>
+    <div>
+      <h2>Scalability</h2>
+      <p>
+        The biggest fishhook is the potential for scalability issues due to the OrientDB connection model.
+      </p>
+      <p>
+        OrientDB encapsulates a connection to a graph database in an instance of the class OrientGraph. The credentials
+        must be passed in at instance construction. This means at least one OrientGraph instance must be created for
+        each logged in user. Clearly this will eventually hit limits with large numbers of users.
+      </p>
+      <h3>Connection Pooling</h3>
+      <p>
+        If this  were a traditional DB user model with a small number of database users servicing all web users,
+        connection pooling would be a fairly simple task. But here every logged in web user requires at least one
+        distinct OrientGraph instance - at least for the duration of a given request. And creating a new OrientGraph
+        instance is a relatively expensive operation.
+      </p>
+      <p>
+        Embedding the database in the web application goes some way to solving this problem by removing the need for any
+        kind of socket resource. However we still want to avoid creating a new OrientGraph instance for every request.
+      </p>
+      <p>
+        Tomcat does log errors about threads started by OrientDB such as the <strong>OrientDB WAL Flush Task</strong>
+        when the database is running embedded. This does not appear to cause any real issues though.
+      </p>
+      <h3>Solutions</h3>
+      <p>
+        <a href="https://github.com/skwidge/OdbResource" target="_blank"><strong>OdbResource</strong></a> provides a
+        connection pool for OrientGraph instances, but it is a kludge. OdbResource instances are created for a
+        particular user and can only be used by that user. They are recycled across requests, but once the number of
+        logged in users exceeds the maximum number of connections in the pool, existing OrientGraph instances must be
+        constantly destroyed so that new instances can be created for other users. What it mostly does is allow us to
+        tune the total number of OrientGraph instances per application (and per user.) This at least allows a web
+        application to fail more gracefully.
+      </p>
+      <p>
+        I have not done any benchmarking on OrientDB to see just how many concurrent OrientGraph instances can be used,
+        nor am I aware of any benchmarking by anyone else, including
+        <a href="http://orientdb.com/" target="_blank">Orient Technologies</a>.
+      </p>
+      <p>
+        What is required is the ability to cheaply re-authenticate existing OrientGraph instances with new sets of
+        credentials. This would allow the creation of a proper connection pool.
+      </p>
+      <p>
+        This document is in part a plea to <a href="http://orientdb.com/" target="_blank">Orient Technologies</a>, the
+        company behind OrientDB, to support these ideas. A better solution than OdbResource requires changes to the
+        OrientDB codebase. I would like to write a patch, but there would be a considerable amount of work involved in
+        producing and then maintaining it. It would help a lot if Orient Technologies were interested in supporting this
+        model.
+      </p>
+    </div>
+    <div>
+      <h2>In Conclusion</h2>
+      <p>
+        <a href="http://orientdb.com/orientdb/">OrientDB</a> is an excellent database for rapid web application
+        development that (very nearly) provides a security model that no other database that I am aware of does. A small
+        amount of work is needed to turn it into something very special.
+      </p>
+      <p>
+        If you like the ideas presented here, <a href="http://orientdb.com/contact/" target="_blank">let Orient
+          Technologies know</a> and encourage them to support the development necessary for this architecture!
+      </p>
+      <p>
+        Regards,
+        <br/>
+        Bruce Ashton
+      </p>
+    </div>
+  </body>
+</html>
