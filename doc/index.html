@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>OdbResource and OdbRealm</title>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="author" content="Bruce Ashton">
+    <meta name="description" content="How to use the OdbResource and OrientGraphPool libraries">
     <style type="text/css"><!--
       body {
         font-family: Helvetica, sans-serif;
@@ -25,6 +27,15 @@
 
       a:hover {
         text-decoration: underline;
+      }
+
+      pre {
+        background-color: #FFF8E7;
+        border-color: #a7a6a6;
+        border-style: solid;
+        border-width: 1px;
+        font-size: 10pt;
+        padding-top: 1em;
       }
 
       table {
@@ -152,8 +163,8 @@
         <a href="http://orientdb.com/">OrientDB</a> was a product that I
         stumbled across a year or two ago. I instantly fell in love with what
         they were trying to do. A graph database with features of
-        document-oriented databases that could be run standalone or embedded.
-        ACID transactions, multi-master replication and record level security!
+        document-oriented databases that could run standalone or embedded. ACID
+        transactions, multi-master replication and record level security!
       </p>
       <p>
         The only reasons I could imagine why more people weren't using were:
