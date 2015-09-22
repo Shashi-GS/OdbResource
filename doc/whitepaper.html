@@ -140,7 +140,7 @@
     <h1>More Secure Web Applications with OrientDB</h1>
     <p>
       Author: Bruce Ashton<br/>
-      Date: 2015-07-25
+      Date: 2015-09-21
     </p>
     <div>
       <h2>Introduction</h2>
@@ -303,53 +303,52 @@
     <div>
       <h2>Scalability</h2>
       <p>
-        The biggest fishhook is the potential for scalability issues due to the OrientDB connection model.
+        The biggest issue is the potential for scalability issues due to the OrientDB connection and authentication
+        model.
       </p>
       <p>
-        OrientDB encapsulates a connection to a graph database in an instance of the class OrientGraph. The credentials
-        must be passed in at instance construction. This means at least one OrientGraph instance must be created for
-        each logged in user. Clearly this will eventually hit limits with large numbers of users.
+        OrientDB encapsulates a connection to a graph database with an instance of the class OrientGraph. The
+        credentials must be passed in at instance construction. This means at least one OrientGraph instance must be
+        created for each logged in user. This will eventually hit limits with large numbers of users.
       </p>
       <h3>Connection Pooling</h3>
       <p>
-        If this  were a traditional DB user model with a small number of database users servicing all web users,
-        connection pooling would be a fairly simple task. But here every logged in web user requires at least one
-        distinct OrientGraph instance - at least for the duration of a given request. And creating a new OrientGraph
-        instance is a relatively expensive operation.
+        If this  were a traditional DB user model, with a small number of database users servicing all web users,
+        connection pooling would be a relatively simple task. But here every logged in web user requires at least one
+        distinct OrientGraph instance, at least for the duration of a given request. Creating a new OrientGraph instance
+        is a relatively expensive operation.
       </p>
       <p>
         Embedding the database in the web application goes some way to solving this problem by removing the need for any
         kind of socket resource. However we still want to avoid creating a new OrientGraph instance for every request.
       </p>
       <p>
-        Tomcat does log errors about threads started by OrientDB such as the <strong>OrientDB WAL Flush Task</strong>
-        when the database is running embedded. This does not appear to cause any real issues though.
-      </p>
-      <h3>Solutions</h3>
-      <p>
-        <a href="https://github.com/skwidge/OdbResource" target="_blank"><strong>OdbResource</strong></a> provides a
-        connection pool for OrientGraph instances, but it is a kludge. OdbResource instances are created for a
-        particular user and can only be used by that user. They are recycled across requests, but once the number of
-        logged in users exceeds the maximum number of connections in the pool, existing OrientGraph instances must be
-        constantly destroyed so that new instances can be created for other users. What it mostly does is allow us to
-        tune the total number of OrientGraph instances per application (and per user.) This at least allows a web
-        application to fail more gracefully.
-      </p>
-      <p>
         I have not done any benchmarking on OrientDB to see just how many concurrent OrientGraph instances can be used,
         nor am I aware of any benchmarking by anyone else, including
         <a href="http://orientdb.com/" target="_blank">Orient Technologies</a>.
       </p>
+      <h3>Solutions</h3>
       <p>
-        What is required is the ability to cheaply re-authenticate existing OrientGraph instances with new sets of
-        credentials. This would allow the creation of a proper connection pool.
+        <a href="https://github.com/skwidge/OdbResource" target="_blank">The OdbResource library</a> provides a
+        pool for OrientGraph instances, but it is a kludge. OrientGraph instances are created for a particular user and
+        can only be used by that user. They are recycled across requests, but once the number of logged in users exceeds
+        the maximum number of connections in the pool, existing OrientGraph instances must be constantly destroyed so
+        that new instances can be created for other users. What it mostly does is allow us to tune the total number of
+        OrientGraph instances per application (and per user.) This at least allows a web application to fail more
+        gracefully.
       </p>
       <p>
-        This document is in part a plea to <a href="http://orientdb.com/" target="_blank">Orient Technologies</a>, the
-        company behind OrientDB, to support these ideas. A better solution than OdbResource requires changes to the
+        What is required is the ability to cheaply re-authenticate existing OrientGraph instances with new sets of
+        credentials. This would allow the creation of a proper connection pool. But this solution requires a patch to
+        OrientDB. It can't be achieved just by library interacting with
+        <a href="http://orientdb.com/javadoc/latest/" target="_blank">OrientDB's public API</a>.
+      </p>
+      <p>
+        So this document is in part a plea to <a href="http://orientdb.com/" target="_blank">Orient Technologies</a>,
+        the company behind OrientDB, to support these ideas. A better solution than OdbResource requires changes to the
         OrientDB codebase. I would like to write a patch, but there would be a considerable amount of work involved in
-        producing and then maintaining it. It would help a lot if Orient Technologies were interested in supporting this
-        model.
+        producing and then maintaining it. It would help a lot to know Orient Technologies were interested in supporting
+        this model of use of OrientDB.
       </p>
     </div>
     <div>
@@ -364,9 +363,7 @@
           Technologies know</a> and encourage them to support the development necessary for this architecture!
       </p>
       <p>
-        Regards,
         <br/>
-        Bruce Ashton
       </p>
     </div>
   </body>
