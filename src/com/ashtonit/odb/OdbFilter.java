@@ -3,9 +3,6 @@ package com.ashtonit.odb;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -15,8 +12,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import com.ashtonit.odb.pool.OrientGraphPool;
 import com.ashtonit.odb.realm.OdbPrincipal;
+import com.orientechnologies.orient.core.db.OPartitionedDatabasePool;
+import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 
@@ -38,7 +36,7 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
  * </p>
  * <p>
  * Both of these values can be configured in the web.xml file with a context-param element, as below;
- * 
+ *
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;orientGraph&lt;/param-name&gt;
@@ -56,14 +54,15 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
  */
 public class OdbFilter implements Filter {
 
-    static final String ORIENT_GRAPH_POOL = "orientGraphPool";
-
     private static final Logger log = Logger.getLogger(OdbFilter.class.getName());
 
     private static final String ORIENT_GRAPH = "orientGraph";
+    private static final String ORIENT_POOL = "orientPool";
+    private static final String ORIENT_POOL_CAPACITY = "orientPoolCapacity";
 
-    private String orientGraphKey;
-    private OrientGraphPool pool;
+    private OPartitionedDatabasePoolFactory factory;
+    private String orientGraph;
+    private String orientPool;
 
 
     /**
@@ -73,6 +72,7 @@ public class OdbFilter implements Filter {
      */
     @Override
     public void destroy() {
+        log.fine("destroy()");
     }
 
 
@@ -85,7 +85,7 @@ public class OdbFilter implements Filter {
      * <p>
      * It uses the <strong>orientGraph</strong> and <strong>orientGraphPool</strong> context parameters.
      * </p>
-     * 
+     *
      * @param request the HTTP Servlet request object
      * @param response the HTTP Servlet response object
      * @param chain the chain object for the chain of command pattern.
@@ -95,17 +95,21 @@ public class OdbFilter implements Filter {
      */
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
+        log.fine("doFilter()");
         final HttpServletRequest httpRequest = (HttpServletRequest) request;
         final OdbPrincipal principal = (OdbPrincipal) httpRequest.getUserPrincipal();
+        log.fine("doFilter(): principal=" + principal);
         if (principal != null) {
-            final HttpSession session = httpRequest.getSession();
-            if (session.getAttribute(OdbPrincipal.class.getName()) == null) {
-                session.setAttribute(OdbPrincipal.class.getName(), principal);
-            }
             OrientGraph graph = null;
             try {
-                graph = pool.get(principal.getDbUrl(), principal.getName(), principal.getPassword());
-                request.setAttribute(orientGraphKey, graph);
+                final HttpSession session = httpRequest.getSession();
+                OPartitionedDatabasePool pool = (OPartitionedDatabasePool) session.getAttribute(ORIENT_POOL);
+                if (pool == null) {
+                    log.fine("doFilter(): pool = factory.get()");
+                    pool = factory.get(principal.getDbUrl(), principal.getName(), principal.getPassword());
+                }
+                graph = new OrientGraph(pool.acquire());
+                request.setAttribute(orientGraph, graph);
                 chain.doFilter(request, response);
             } finally {
                 if (graph != null && !graph.isClosed()) {
@@ -132,7 +136,7 @@ public class OdbFilter implements Filter {
      * </p>
      * <p>
      * Both of these values can be configured in the web.xml file with a context-param element, as below;
-     * 
+     *
      * <pre>
      * &lt;context-param&gt;
      *     &lt;param-name&gt;orientGraph&lt;/param-name&gt;
@@ -144,21 +148,33 @@ public class OdbFilter implements Filter {
      *     &lt;param-value&gt;odbp&lt;/param-value&gt;
      * &lt;/context-param&gt;
      * </pre>
-     * 
+     *
      * @param config the container object for filter parameters
      * @see Filter#init(FilterConfig)
      */
     @Override
     public void init(final FilterConfig config) {
-        try {
-            orientGraphKey = config.getServletContext().getInitParameter(ORIENT_GRAPH);
-            final String orientGraphPoolKey = config.getServletContext().getInitParameter(ORIENT_GRAPH_POOL);
-            final Context initCtx = new InitialContext();
-            final Context envCtx = (Context) initCtx.lookup("java:comp/env");
-            pool = (OrientGraphPool) envCtx.lookup(orientGraphPoolKey);
-        } catch (final NamingException e) {
-            log.throwing(OdbFilter.class.getName(), "init(FilterConfig)", e);
-            log.severe(e.getMessage());
+        log.fine("init()");
+
+        final String orientGraph = config.getServletContext().getInitParameter(ORIENT_GRAPH);
+        if (orientGraph != null) {
+            this.orientGraph = orientGraph;
         }
+        log.fine("init(): orientGraph=" + this.orientGraph);
+
+        final String orientPool = config.getServletContext().getInitParameter(ORIENT_POOL);
+        if (orientPool != null) {
+            this.orientPool = orientPool;
+        }
+        log.fine("init(): orientPool=" + this.orientPool);
+
+        final String capacityStr = config.getServletContext().getInitParameter(ORIENT_POOL_CAPACITY);
+        int capacity = 100;
+        if (capacityStr != null) {
+            capacity = Integer.parseInt(capacityStr);
+        }
+        log.fine("init(): capacity=" + capacity);
+
+        factory = new OPartitionedDatabasePoolFactory(capacity);
     }
 }

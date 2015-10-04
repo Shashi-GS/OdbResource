@@ -19,6 +19,7 @@ import org.apache.catalina.realm.RealmBase;
 import org.ietf.jgss.GSSContext;
 
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePool;
+import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
@@ -44,18 +45,17 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
  * </ol>
  * <p>
  * An example of an OdbRealm definition would be:
- * 
+ *
  * <pre>
  *   &lt;Realm
  *     className="com.ashtonit.odb.realm.OdbRealm"
  *     dbPass="admin"
- *     dbResource="odbp"
+ *     dbResource="opdpfactory"
  *     dbUrl="plocal:/opt/odb/mygraphdb"
  *     dbUser="admin"
- *     poolSize="64"
  *   /&gt;
  * </pre>
- * 
+ *
  * @author Bruce Ashton
  * @date 2014-06-22
  */
@@ -73,15 +73,11 @@ public class OdbRealm extends RealmBase {
     private static final String SHA256 = "SHA-256";
     private static final String SHA256_PREFIX = "{SHA-256}";
 
-    private final Object poolLock = new Object();
-
     private String dbPass;
     private String dbResource;
-    private Object dbResourceImpl;
     private String dbUrl;
     private String dbUser;
     private OPartitionedDatabasePool pool;
-    private int poolSize;
 
 
     /**
@@ -98,7 +94,6 @@ public class OdbRealm extends RealmBase {
             log.throwing(OdbRealm.class.getName(), "authenticate(String, String)", e);
         }
         setCredentialHandler(handler);
-        setPoolSize(64);
     }
 
 
@@ -259,17 +254,6 @@ public class OdbRealm extends RealmBase {
 
 
     /**
-     * Sets the database pool size for the realm user only. This pool is only used for authentication. It has no effect
-     * on the OrientGraphPool instance that the web application will interact with.
-     *
-     * @param poolSize the database pool size
-     */
-    public void setPoolSize(final int poolSize) {
-        this.poolSize = poolSize;
-    }
-
-
-    /**
      * Return a short name for this Realm implementation, for use in log messages.
      *
      * @return a short name for this Realm implementation
@@ -285,7 +269,7 @@ public class OdbRealm extends RealmBase {
      * This method is not supported by this implementation.
      *
      * @param username
-     * @return his method never returns
+     * @return this method never returns
      * @see RealmBase#getPassword(String)
      * @throws UnsupportedOperationException when called
      */
@@ -312,18 +296,16 @@ public class OdbRealm extends RealmBase {
 
 
     private final ODatabaseDocumentTx getDb() throws NamingException {
-        if (dbResourceImpl == null && dbResource != null) {
-            // We never use dbResourceImpl but only look it up once.
-            final Context initCtx = new InitialContext();
-            final Context envCtx = (Context) initCtx.lookup("java:comp/env");
-            dbResourceImpl = envCtx.lookup(dbResource);
-        }
         if (pool == null) {
             // Set the internal realm connection pool.
-            synchronized (poolLock) {
-                if (pool == null) {
-                    pool = new OPartitionedDatabasePool(dbUrl, dbUser, dbPass, poolSize);
-                }
+            if (dbResource != null) {
+                // Use the factory if dbResource is set.
+                final Context initCtx = new InitialContext();
+                final Context envCtx = (Context) initCtx.lookup("java:comp/env");
+                final OPartitionedDatabasePoolFactory factory = (OPartitionedDatabasePoolFactory) envCtx.lookup(dbResource);
+                pool = factory.get(dbUrl, dbUser, dbPass);
+            } else {
+                pool = new OPartitionedDatabasePool(dbUrl, dbUser, dbPass);
             }
         }
         return pool.acquire();
