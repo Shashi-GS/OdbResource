@@ -24,7 +24,6 @@
 		<dependency org="com.orientechnologies" name="orientdb-server" rev="latest.release" transitive="true" />
 		<dependency org="org.apache.tomcat" name="tomcat-catalina" rev="latest.release" transitive="false" />
 		<dependency org="org.apache.tomcat" name="tomcat-juli" rev="latest.release" transitive="false" />
-		<dependency org="org.apache.tomcat" name="tomcat-util" rev="latest.release" transitive="false" />
 		<dependency org="org.apache.tomcat" name="tomcat-util-scan" rev="latest.release" transitive="false" />
 	</dependencies>
 </ivy-module>

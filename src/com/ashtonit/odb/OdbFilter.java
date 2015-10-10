@@ -20,8 +20,8 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 /**
  * <p>
- * This class is responsible for obtaining an {@link OrientGraph} instance from {@link OrientGraphPool} and setting it
- * as an attribute on the request object.
+ * This class is responsible for obtaining an {@link OrientGraph} instance from {@link OPartitionedDatabasePool} and
+ * setting it as an attribute on the request object.
  * </p>
  * <p>
  * It pulls three context parameters from the servlet context;
