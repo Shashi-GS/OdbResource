@@ -17,6 +17,37 @@ import com.orientechnologies.orient.server.OServerMain;
 
 
 /**
+ * <p>
+ * An implementation of {@link ObjectFactory} that returns an {@link OPartitionedDatabasePoolFactory} instance in
+ * response to a JNDI lookup.
+ * </p>
+ * <p>
+ * If the <strong>configFile</strong> attribute is present in configuration the OrientDB server will be started as an
+ * embedded instance. If the attribute is not present it will just provide the {@link OPartitionedDatabasePoolFactory}
+ * instance.
+ * </p>
+ * <p>
+ * In a Tomcat web application, the name of this class is the value of the factory attribute of a &lt;Resource&gt; tag.
+ * The parameters given in the table above are also specified as attributes of the resource tag. The type attribute is
+ * com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory. The resource should always be a singleton and a
+ * closeMethod attribute with the value "close" should also be present. The auth attribute should have the value
+ * "Container". The server config file for OrientDB should be passed in with the attribute "configFile" if you wish to
+ * run an embedded OrientDB server.<br>
+ * e.g.
+ * </p>
+ * 
+ * <pre>
+ * &lt;Resource
+ *   auth="Container"
+ *   closeMethod="close"
+ *   configFile="/mnt/share/orientdb-community-2.1.3/config/orientdb-server-config.xml"
+ *   factory="com.ashtonit.odb.OPDPFObjectFactory"
+ *   name="opdpfactory"
+ *   singleton="true"
+ *   type="com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory"
+ * /&gt;
+ * </pre>
+ * 
  * @author Bruce Ashton
  * @date 2015-10-03
  */
@@ -32,12 +63,16 @@ public class OPDPFObjectFactory implements ObjectFactory {
 
 
     /**
-     * @param obj
-     * @param name
-     * @param nameCtx
-     * @param environment
-     * @return
-     * @throws NamingException
+     * Returns an OrientGraphPool instance and initialises the embedded OServer instance with the config file specified
+     * as an attribute. This instance is always a singleton, regardless of attributes in server.xml files etc.
+     *
+     * @param obj the naming reference
+     * @param name not used
+     * @param nameCtx not used
+     * @param environment not used
+     * @return the {@link OPartitionedDatabasePoolFactory} instance
+     * @throws NamingException if the config file is not a normal, readable file
+     * @throws RuntimeException if the embedded server startup throws an Exception
      * @see ObjectFactory#getObjectInstance(Object, Name, Context, Hashtable)
      */
     @Override

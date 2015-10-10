@@ -24,33 +24,42 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
  * as an attribute on the request object.
  * </p>
  * <p>
- * It pulls two context parameters from the servlet context;
+ * It pulls three context parameters from the servlet context;
  * </p>
  * <p>
  * <strong>orientGraph</strong> is used to set the name of the request attribute that will contain the instance of
  * {@link OrientGraph} as its value.
  * </p>
  * <p>
- * <strong>orientGraphPool</strong> tells this OdbFilter instance the JNDI name of the graph database pool instance
- * relative to, "java:comp/env". It must match your resource configuration.
+ * <strong>orientPool</strong> tells this OdbFilter instance the JNDI name of the graph database pool instance relative
+ * to, "java:comp/env". It must match your resource configuration and must also be configured as a ResourceLink in
+ * context.xml if it is a Resource in server.xml.
  * </p>
  * <p>
- * Both of these values can be configured in the web.xml file with a context-param element, as below;
+ * <strong>orientPoolCapacity</strong> sets the maximum number of connections for the connection pool.
+ * </p>
+ * <p>
+ * All three of these values can be configured in the web.xml file with a context-param element, as below;
  *
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;orientGraph&lt;/param-name&gt;
- *     &lt;param-value&gt;graph&lt;/param-value&gt;
+ *     &lt;param-value&gt;orientGraph&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * 
  * &lt;context-param&gt;
- *     &lt;param-name&gt;orientGraphPool&lt;/param-name&gt;
- *     &lt;param-value&gt;odbp&lt;/param-value&gt;
+ *     &lt;param-name&gt;orientPool&lt;/param-name&gt;
+ *     &lt;param-value&gt;orientPool&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * 
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;orientPoolCapacity&lt;/param-name&gt;
+ *     &lt;param-value&gt;100&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
  *
  * @author Bruce Ashton
- * @date 2/07/2014
+ * @date 2014-07-02
  */
 public class OdbFilter implements Filter {
 
@@ -124,28 +133,37 @@ public class OdbFilter implements Filter {
 
     /**
      * <p>
-     * This method pulls two context parameters from the servlet context;
+     * This method pulls three context parameters from the servlet context;
      * </p>
      * <p>
-     * <strong>orientGraph</strong> is used to set the name of the session attribute that will contain the instance of
+     * <strong>orientGraph</strong> is used to set the name of the request attribute that will contain the instance of
      * {@link OrientGraph} as its value.
      * </p>
      * <p>
-     * <strong>orientGraphPool</strong> sets the JNDI name of the graph database pool instance relative to,
-     * "java:comp/env".
+     * <strong>orientPool</strong> tells this OdbFilter instance the JNDI name of the graph database pool instance
+     * relative to, "java:comp/env". It must match your resource configuration and must also be configured as a
+     * ResourceLink in context.xml if it is a Resource in server.xml.
      * </p>
      * <p>
-     * Both of these values can be configured in the web.xml file with a context-param element, as below;
+     * <strong>orientPoolCapacity</strong> sets the maximum number of connections for the connection pool.
+     * </p>
+     * <p>
+     * All of these values can be configured in the web.xml file with a context-param element, as below;
      *
      * <pre>
      * &lt;context-param&gt;
      *     &lt;param-name&gt;orientGraph&lt;/param-name&gt;
-     *     &lt;param-value&gt;graph&lt;/param-value&gt;
+     *     &lt;param-value&gt;orientGraph&lt;/param-value&gt;
      * &lt;/context-param&gt;
      * 
      * &lt;context-param&gt;
-     *     &lt;param-name&gt;orientGraphPool&lt;/param-name&gt;
-     *     &lt;param-value&gt;odbp&lt;/param-value&gt;
+     *     &lt;param-name&gt;orientPool&lt;/param-name&gt;
+     *     &lt;param-value&gt;orientPool&lt;/param-value&gt;
+     * &lt;/context-param&gt;
+     * 
+     * &lt;context-param&gt;
+     *     &lt;param-name&gt;orientPoolCapacity&lt;/param-name&gt;
+     *     &lt;param-value&gt;100&lt;/param-value&gt;
      * &lt;/context-param&gt;
      * </pre>
      *

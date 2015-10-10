@@ -16,8 +16,7 @@ import org.ietf.jgss.GSSCredential;
 /**
  * This class extends {@link GenericPrincipal} and also contains a dbUrl property, the value of which must be the URL of
  * the OrientDB database. The name, password and dbUrl properties can be used to instantiate an OrientGraph instance or
- * obtain one through the pool. If you use OdbFilter and OdbSessionListener you should not need to use this class
- * anywhere else.
+ * obtain one through the pool. If you use OdbFilter you should not need to use this class anywhere else.
  * 
  * @author Bruce Ashton
  * @date 2014-07-03
