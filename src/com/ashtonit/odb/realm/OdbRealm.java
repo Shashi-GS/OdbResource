@@ -28,8 +28,8 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 /**
  * A Tomcat Realm class for OrientDB graph databases.
  * <p>
- * OdbRealm allows a web application to authenticate users against an embedded OrientDB database. Authentication is for
- * actual database users, not just arbitrary records in the database.
+ * OdbRealm allows a web application to authenticate users against an embedded or standalone OrientDB database.
+ * Authentication is for actual database users, not just arbitrary records in the database.
  * </p>
  * <p>
  * The <a href="https://tomcat.apache.org/tomcat-8.0-doc/config/realm.html" target="_blank">Tomcat guide on realm
@@ -39,13 +39,13 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
  * <li>The value of the dbUser attribute must be the name of a user with read access to the OUser class in the OrientDB
  * database. The "admin" user can be used for this for development and testing purposes.</li>
  * <li>The value of the dbResource attribute must match the value of the "name" attribute in your OdbResource
- * configuration.</li>
+ * configuration. If it is not present the realm creates its own instance of {@link OPartitionedDatabasePool} with the
+ * default capacity of 100.</li>
  * <li>The value of the dbUrl attribute must be a valid OrientDB URI.</li>
- * <li>The realm uses a separate connection pool just for authenticating users. The pool size defaults to 64.</li>
  * </ol>
  * <p>
- * An example of an OdbRealm definition would be:
- *
+ * An example OdbRealm definition:
+ * 
  * <pre>
  *   &lt;Realm
  *     className="com.ashtonit.odb.realm.OdbRealm"
@@ -81,8 +81,7 @@ public class OdbRealm extends RealmBase {
 
 
     /**
-     * The default constructor sets the SHA-256 message digest credential handler and default configuration parameters
-     * as required.
+     * The default constructor sets the SHA-256 message digest credential handler.
      */
     public OdbRealm() {
         final MessageDigestCredentialHandler handler = new MessageDigestCredentialHandler();
@@ -221,9 +220,15 @@ public class OdbRealm extends RealmBase {
 
 
     /**
-     * Sets the name of an arbitrary database resource class. The resource is never used, but may need to be discovered
-     * via the JNDI service to prompt some initialisation before any user queries are made. This is the case with the
-     * OdbResource OrientGraph pool.
+     * Sets the name of an arbitrary database resource class.
+     * <p>
+     * If present the realm will use it to look up the {@link OPartitionedDatabasePoolFactory} in the Tomcat JNDI
+     * service and obtain a pool from it.
+     * </p>
+     * <p>
+     * If it is not present the realm will create a new {@link OPartitionedDatabasePool} with the default capacity of
+     * 100.
+     * </p>
      *
      * @param dbResource the JNDI name of the resource
      */
