@@ -418,67 +418,6 @@
           This allows multiple databases, each managed by a different realm.
           The OdbResource configuration defines the server, not the database.
         </p>
-        <h3>A Filter Example</h3>
-        <p>
-          A better way to obtain and release OrientGraph instances from the
-          pool is by using <strong>OdbFilter</strong>.
-        </p>
-        <p>
-          OdbFilter gets an OrientGraph instance using the session principal
-          sets it as a request attribute. It also calls shutdown to release the
-          instance at the end of the request.
-        </p>
-        <p>
-          OdbFilter is configured in <strong>web.xml</strong>. It requires the
-          following elements:
-          <pre>
-            &lt;context-param&gt;
-              &lt;param-name&gt;orientGraph&lt;/param-name&gt;
-              &lt;param-value&gt;orientGraph&lt;/param-value&gt;
-            &lt;/context-param&gt;
-
-            &lt;context-param&gt;
-              &lt;param-name&gt;orientPool&lt;/param-name&gt;
-              &lt;param-value&gt;orientPool&lt;/param-value&gt;
-            &lt;/context-param&gt;
-
-            &lt;filter&gt;
-              &lt;filter-name&gt;odbFilter&lt;/filter-name&gt;
-              &lt;filter-class&gt;com.ashtonit.odb.OdbFilter&lt;/filter-class&gt;
-            &lt;/filter&gt;
-
-            &lt;filter-mapping&gt;
-              &lt;filter-name&gt;odbFilter&lt;/filter-name&gt;
-              &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
-            &lt;/filter-mapping&gt;
-          </pre>
-          The param-value and filter-name elements have example values only.
-          See the <a href="api/com/ashtonit/odb/OdbFilter.html"
-                     target="_blank">API documentation</a> for OdbFilter for
-          more detail.
-        </p>
-        <p>
-          After this, the servlet example becomes:
-          <pre>
-            public class MyServlet extends HttpServlet {
-
-                public void service(HttpServletRequest request, HttpServletResponse response)
-                  throws ServletException, IOException {
-
-                    OrientGraph graph = graph = request.getAttribute("orientGraph");
-
-                    OrientVertex vertex = graph.getVertex("myVertexKey");
-                    out.println("&lt;html&gt;");
-                    out.println("&lt;body&gt;");
-                    out.println("&lt;h1&gt;");
-                    out.println(vertex.toString());
-                    out.println("&lt;/h1&gt;");
-                    out.println("&lt;/body&gt;");
-                    out.println("&lt;/html&gt;");
-                }
-            }
-          </pre>
-        </p>
       </div>
         <p>
           Here endeth the user guide.

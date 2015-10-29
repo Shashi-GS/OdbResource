@@ -8,10 +8,10 @@
 	<property name="classes" location="classes" />
 	<property name="doc" location="doc" />
 	<property name="lib" location="lib" />
-	<property name="source" value="1.8" />
+	<property name="source" value="1.5" />
 	<property name="src" location="src" />
-	<property name="target" value="1.8" />
-	<property name="version" value="1.1" />
+	<property name="target" value="1.5" />
+	<property name="version" value="2.0" />
 
 	<property name="api" location="${doc}/api" />
 	<property name="api.javaee7" value="http://docs.oracle.com/javaee/7/api/" />

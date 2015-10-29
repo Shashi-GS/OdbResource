@@ -1,12 +1,8 @@
 /**
- * Contains the classes used to manage {@link OPartitionedDatabasePool} pools of {@link OrientGraph} instances in a
+ * Contains one class used to manage {@link OPartitionedDatabasePool} pools of {@link OrientGraph} instances in a
  * Tomcat web application.
  * <p>
- * {@link OdbFilter} takes care of obtaining an {@link OrientGraph} instance from the pool at the start of a request
- * and releasing it again at the end of request processing.
- * </p>
- * <p>
- * {@link OPDPFObjectFactory} implements {@link OPDPFObjectFactory} and allows lookup of an
+ * {@link OPDPFObjectFactory} implements {@link ObjectFactory} and allows lookup of an
  * {@link OPartitionedDatabasePoolFactory} instance from a JNDI service.
  * </p>
  * 
