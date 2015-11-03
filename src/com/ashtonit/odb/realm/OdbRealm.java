@@ -26,7 +26,7 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 
 /**
- * A Tomcat Realm class for OrientDB graph databases.
+ * A Tomcat Realm class for OrientDB databases.
  * <p>
  * OdbRealm allows a web application to authenticate users against an embedded or standalone OrientDB database.
  * Authentication is for actual database users, not just arbitrary records in the database.
@@ -51,7 +51,7 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
  *     className="com.ashtonit.odb.realm.OdbRealm"
  *     dbPass="admin"
  *     dbResource="opdpfactory"
- *     dbUrl="plocal:/opt/odb/mygraphdb"
+ *     dbUrl="plocal:/opt/odb/mydb"
  *     dbUser="admin"
  *   /&gt;
  * </pre>

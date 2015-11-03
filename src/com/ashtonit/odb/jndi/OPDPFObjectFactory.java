@@ -1,4 +1,4 @@
-package com.ashtonit.odb;
+package com.ashtonit.odb.jndi;
 
 import java.io.File;
 import java.util.Enumeration;
@@ -32,13 +32,14 @@ import com.orientechnologies.orient.server.OServerMain;
  * com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory. The resource should always be a singleton and a
  * closeMethod attribute with the value "close" should also be present. The auth attribute should have the value
  * "Container". The server config file for OrientDB should be passed in with the attribute "configFile" if you wish to
- * run an embedded OrientDB server.<br>
+ * run an embedded OrientDB server. The maximum number of connections can be set with the attribute, "capacity".<br>
  * e.g.
  * </p>
  * 
  * <pre>
  * &lt;Resource
  *   auth="Container"
+ *   capacity="100"
  *   closeMethod="close"
  *   configFile="/mnt/share/orientdb-community-2.1.3/config/orientdb-server-config.xml"
  *   factory="com.ashtonit.odb.OPDPFObjectFactory"
@@ -63,8 +64,9 @@ public class OPDPFObjectFactory implements ObjectFactory {
 
 
     /**
-     * Returns an OrientGraphPool instance and initialises the embedded OServer instance with the config file specified
-     * as an attribute. This instance is always a singleton, regardless of attributes in server.xml files etc.
+     * Returns an OrientGraphPool instance and initialises an embedded OServer instance with the config file specified
+     * as an attribute, if it is present. This instance is always a singleton, regardless of attributes in server.xml
+     * files etc.
      *
      * @param obj the naming reference
      * @param name not used
