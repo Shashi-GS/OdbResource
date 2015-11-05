@@ -8,11 +8,10 @@
  * 
  * @author Bruce Ashton
  */
-package com.ashtonit.odb;
+package com.ashtonit.odb.jndi;
 
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePool;
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 import javax.naming.spi.ObjectFactory;
 
