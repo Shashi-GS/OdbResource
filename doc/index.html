@@ -373,7 +373,7 @@
                    target="_blank">Principal</a> implementation used by
             OdbRealm is <a href="api/com/ashtonit/odb/realm/OdbPrincipal.html"
                            target="_blank">OdbPrincipal</a>. If you want to
-            look up an OrientGraph instance directly from a JNDI context in
+            look up an OrientDB pool factory directly from a JNDI context in
             your web application you can cast the principal to OdbPrincipal and
             then obtain the OrientDB URL as well as the username and password.
             See the servlet example just below.
@@ -381,8 +381,8 @@
         </div>
         <h3>A Servlet Example</h3>
         <p>
-          Here we have a simple example showing how to look up the graph
-          database pool in the JNDI context, obtain and use an OrientGraph
+          Here we have a simple example showing how to look up the database
+          pool factory in the JNDI context, obtain and use an OrientGraph
           instance and release it again.
           <pre>
             public class MyServlet extends HttpServlet {
