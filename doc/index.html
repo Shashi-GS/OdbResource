@@ -253,6 +253,9 @@
                 The auth attribute must have a value of "Container".
               </li>
               <li>
+                The capacity attribute sets the maximum number of connections available.
+              </li>
+              <li>
                 The closeMethod attribute must have a value of "close".
               </li>
               <li>
@@ -275,6 +278,7 @@
             <pre>
               &lt;Resource
                  auth="Container"
+                 capacity="100"
                  closeMethod="close"
                  configFile="/opt/orientdb-community-2.1.3/config/orientdb-server-config.xml"
                  factory="com.ashtonit.odb.jndi.OPDPFObjectFactory"
@@ -283,12 +287,12 @@
                  type="com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory"
                /&gt;
             </pre>
-            The only attribute in the above element that is not described in
-            the Tomcat configuration guide is <strong>configFile</strong>. Add
-            this attribute if you want to run an embedded OrientDB server. The
-            value should be the name of the OrientDB server configuration file.
-            Refer to the OrientDB manual if you edit this file. I have
-            generally left it untouched.
+            The only attributes in the above element that are not described in
+            the Tomcat configuration guide are <strong>capacity</strong> and
+            <strong>configFile</strong>. Add configFile if you want to run an
+            embedded OrientDB server. The value should be the name of the
+            OrientDB server configuration file. Refer to the OrientDB manual if
+            you edit this file. I have generally left it untouched.
           </p>
           <p>
             Finally, to make the resource available to a given web application
