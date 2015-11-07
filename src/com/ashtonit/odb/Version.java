@@ -1,7 +1,7 @@
 package com.ashtonit.odb;
 
 /**
- * This interface adds a version string to public OdbRealm classes.
+ * This class provides a version string for public OdbRealm classes.
  * 
  * @author Bruce Ashton
  * @date 2014-06-22
