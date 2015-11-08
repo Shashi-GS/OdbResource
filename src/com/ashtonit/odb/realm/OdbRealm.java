@@ -1,6 +1,6 @@
 package com.ashtonit.odb.realm;
 
-import static com.ashtonit.odb.Version.VERSION;
+import static com.ashtonit.odb.realm.Version.VERSION;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;

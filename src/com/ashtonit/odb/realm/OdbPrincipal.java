@@ -1,6 +1,6 @@
 package com.ashtonit.odb.realm;
 
-import static com.ashtonit.odb.Version.VERSION;
+import static com.ashtonit.odb.realm.Version.VERSION;
 
 import java.security.Principal;
 import java.util.List;

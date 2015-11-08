@@ -1,2 +1,2 @@
 # OdbResource
-A Resource and realm for running OrientDB as an embedded graph database in Tomcat
+A Resource and realm for managing OrientDB connection pools in Tomcat

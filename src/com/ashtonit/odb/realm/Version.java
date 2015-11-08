@@ -1,4 +1,4 @@
-package com.ashtonit.odb;
+package com.ashtonit.odb.realm;
 
 /**
  * This class provides a version string for public OdbRealm classes.
@@ -6,7 +6,7 @@ package com.ashtonit.odb;
  * @author Bruce Ashton
  * @date 2014-06-22
  */
-public final class Version {
+final class Version {
 
-    public static final String VERSION = "2.0";
+    static final String VERSION = "2.0.1";
 }
