@@ -22,17 +22,19 @@ import com.orientechnologies.orient.server.OServerMain;
  * response to a JNDI lookup.
  * </p>
  * <p>
- * If the <strong>configFile</strong> attribute is present in configuration the OrientDB server will be started as an
+ * If the <code>configFile</code> attribute is present in configuration the OrientDB server will be started as an
  * embedded instance. If the attribute is not present it will just provide the {@link OPartitionedDatabasePoolFactory}
  * instance.
  * </p>
  * <p>
- * In a Tomcat web application, the name of this class is the value of the factory attribute of a &lt;Resource&gt; tag.
- * The parameters given in the table above are also specified as attributes of the resource tag. The type attribute is
- * com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory. The resource should always be a singleton and a
- * closeMethod attribute with the value "close" should also be present. The auth attribute should have the value
- * "Container". The server config file for OrientDB should be passed in with the attribute "configFile" if you wish to
- * run an embedded OrientDB server. The maximum number of connections can be set with the attribute, "capacity".<br>
+ * In a Tomcat web application, the name of this class is the value of the factory attribute of a
+ * <code>&lt;Resource&gt;</code> tag. The parameters given in the table above are also specified as attributes of the
+ * resource tag. The type attribute is
+ * <code>com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory.</code> The resource should always be a
+ * singleton and a closeMethod attribute with the value "<code>close</code>" should also be present. The
+ * <code>auth</code> attribute should have the value "<code>Container</code>". The server config file for OrientDB
+ * should be passed in with the attribute "<code>configFile</code>" if you wish to run an embedded OrientDB server. The
+ * maximum number of connections can be set with the <code>capacity<code> attribute.<br>
  * e.g.
  * </p>
  * 

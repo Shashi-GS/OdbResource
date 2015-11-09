@@ -35,13 +35,14 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
  * The <a href="https://tomcat.apache.org/tomcat-8.0-doc/config/realm.html" target="_blank">Tomcat guide on realm
  * configuration is here</a>. Important things to note for OdbRealm configuration are:
  * <ol>
- * <li>The className attribute must have a value of "com.ashtonit.odb.realm.OdbRealm".</li>
- * <li>The value of the dbUser attribute must be the name of a user with read access to the OUser class in the OrientDB
- * database. The "admin" user can be used for this for development and testing purposes.</li>
- * <li>The value of the dbResource attribute must match the value of the "name" attribute in your OdbResource
- * configuration. If it is not present the realm creates its own instance of {@link OPartitionedDatabasePool} with the
- * default capacity of 100.</li>
- * <li>The value of the dbUrl attribute must be a valid OrientDB URI.</li>
+ * <li>The <code>className</code> attribute must have a value of "<code>com.ashtonit.odb.realm.OdbRealm</code>".</li>
+ * <li>The value of the <code>dbUser</code> attribute must be the name of a user with read access to the
+ * <code>OUser</code> class in the OrientDB database. The "admin" user can be used for this for development and testing
+ * purposes.</li>
+ * <li>The value of the <code>dbResource</code> attribute must match the value of the "<code>name</code>" attribute in
+ * your OdbResource configuration. If it is not present the realm creates its own instance of
+ * {@link OPartitionedDatabasePool} with the default capacity of 100.</li>
+ * <li>The value of the <code>dbUrl</code> attribute must be a valid OrientDB URI.</li>
  * </ol>
  * <p>
  * An example OdbRealm definition:
