@@ -34,7 +34,7 @@ import com.orientechnologies.orient.server.OServerMain;
  * singleton and a closeMethod attribute with the value "<code>close</code>" should also be present. The
  * <code>auth</code> attribute should have the value "<code>Container</code>". The server config file for OrientDB
  * should be passed in with the attribute "<code>configFile</code>" if you wish to run an embedded OrientDB server. The
- * maximum number of connections can be set with the <code>capacity<code> attribute.<br>
+ * maximum number of connections can be set with the <code>capacity</code> attribute.<br>
  * e.g.
  * </p>
  * 
