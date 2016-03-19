@@ -1,10 +1,10 @@
 package com.ashtonit.odb.jndi;
 
-import java.io.File;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
@@ -12,8 +12,6 @@ import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
-import com.orientechnologies.orient.server.OServer;
-import com.orientechnologies.orient.server.OServerMain;
 
 
 /**
@@ -37,7 +35,7 @@ import com.orientechnologies.orient.server.OServerMain;
  * maximum number of connections can be set with the <code>capacity</code> attribute.<br>
  * e.g.
  * </p>
- * 
+ *
  * <pre>
  * &lt;Resource
  *   auth="Container"
@@ -46,29 +44,33 @@ import com.orientechnologies.orient.server.OServerMain;
  *   configFile="/mnt/share/orientdb-community-2.1.3/config/orientdb-server-config.xml"
  *   factory="com.ashtonit.odb.OPDPFObjectFactory"
  *   name="opdpfactory"
+ *   server="oServer"
  *   singleton="true"
  *   type="com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory"
  * /&gt;
  * </pre>
- * 
+ *
  * @author Bruce Ashton
  * @date 2015-10-03
  */
 public class OPDPFObjectFactory implements ObjectFactory {
 
     private static final String CAPACITY = "capacity";
-    private static final String CONFIG_FILE_NAME = "configFile";
-
+    private static final String JAVA_COMP_ENV = "java:comp/env";
     private static final Object LOCK = new Object();
+    private static final String SERVER = "server";
 
     private static OPartitionedDatabasePoolFactory factory;
-    private static OServer server;
+    private static Object server;
 
 
     /**
-     * Returns an OrientGraphPool instance and initialises an embedded OServer instance with the config file specified
-     * as an attribute, if it is present. This instance is always a singleton, regardless of attributes in server.xml
-     * files etc.
+     * Returns an OPartitionedDatabasePoolFactory instance and optionally initialises an embedded OServer instance if
+     * the resource name is passed in as an attribute. This instance is always a singleton, regardless of attributes in
+     * server.xml files etc.
+     * <p>
+     * The OServer instance is just looked up in JNDI. It is the responsibility of the OServer object factory to
+     * actually start the server up.
      *
      * @param obj the naming reference
      * @param name not used
@@ -81,60 +83,38 @@ public class OPDPFObjectFactory implements ObjectFactory {
      */
     @Override
     public OPartitionedDatabasePoolFactory getObjectInstance(final Object obj, final Name name, final Context nameCtx, final Hashtable<?, ?> environment) throws NamingException {
-        synchronized (LOCK) {
-            if (factory == null) {
-                // Don't do file system access if we already have a server.
-                if (server == null) {
-                    // OK, look for the config file
+        if (factory == null) {
+            synchronized (LOCK) {
+                if (factory == null) {
                     final Reference reference = (Reference) obj;
 
-                    String configFile = null;
+                    int capacity = 100;
+                    String serverRef = null;
 
                     for (final Enumeration<RefAddr> e = reference.getAll(); e.hasMoreElements();) {
                         final RefAddr addr = e.nextElement();
-                        if (CONFIG_FILE_NAME.equalsIgnoreCase(addr.getType())) {
-                            configFile = (String) addr.getContent();
-                            break;
+                        if (CAPACITY.equalsIgnoreCase(addr.getType())) {
+                            capacity = Integer.valueOf((String) addr.getContent());
+                        } else if (SERVER.equalsIgnoreCase(addr.getType())) {
+                            serverRef = (String) addr.getContent();
                         }
                     }
 
-                    if (configFile != null) {
-                        // We must be running embedded
-                        final File file = new File(configFile);
-                        if (!file.exists()) {
-                            throw new NamingException(CONFIG_FILE_NAME + " does not exist");
-                        }
-                        if (!file.canRead()) {
-                            throw new NamingException(CONFIG_FILE_NAME + " cannot be read");
-                        }
-                        if (!file.isFile()) {
-                            throw new NamingException(CONFIG_FILE_NAME + " is not a normal file");
-                        }
-
-                        // Create and start the server
-                        try {
-                            server = OServerMain.create();
-                            server.startup(file);
-                            server.activate();
-                        } catch (final Exception e) {
-                            throw new RuntimeException(e);
+                    if (server == null) {
+                        if (serverRef != null) {
+                            if (nameCtx != null) {
+                                server = nameCtx.lookup(serverRef);
+                            } else {
+                                final Context initCtx = new InitialContext(environment);
+                                final Context envCtx = (Context) initCtx.lookup(JAVA_COMP_ENV);
+                                server = envCtx.lookup(serverRef);
+                            }
                         }
                     }
+                    factory = new OPartitionedDatabasePoolFactory(capacity);
                 }
-                final Reference reference = (Reference) obj;
-
-                int capacity = 100;
-
-                for (final Enumeration<RefAddr> e = reference.getAll(); e.hasMoreElements();) {
-                    final RefAddr addr = e.nextElement();
-                    if (CAPACITY.equalsIgnoreCase(addr.getType())) {
-                        capacity = Integer.valueOf((String) addr.getContent());
-                        break;
-                    }
-                }
-                factory = new OPartitionedDatabasePoolFactory(capacity);
             }
-            return factory;
         }
+        return factory;
     }
 }

@@ -8,7 +8,7 @@
 	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
 	<info organisation="com.ashtonit" module="odbresource" status="integration">
 		<ivyauthor name="Ashton I T Ltd" url="http://www.ashtonit.com" />
-		<description homepage="http://www.ashtonit.com/odbresource.html">
+		<description homepage="http://skwidge.github.io/OdbResource/">
 			Tested with Apache Tomcat 8.0
 		</description>
 	</info>
@@ -19,11 +19,12 @@
 		<artifact name="odbresource" type="jar" conf="impl" ext="jar" />
 	</publications>
 	<dependencies defaultconf="*->*,!sources,!javadoc">
-		<dependency org="com.orientechnologies" name="orientdb-enterprise" rev="latest.release" transitive="true" />
-		<dependency org="com.orientechnologies" name="orientdb-graphdb" rev="latest.release" transitive="true" />
-		<dependency org="com.orientechnologies" name="orientdb-server" rev="latest.release" transitive="true" />
-		<dependency org="org.apache.tomcat" name="tomcat-catalina" rev="latest.release" transitive="false" />
-		<dependency org="org.apache.tomcat" name="tomcat-juli" rev="latest.release" transitive="false" />
-		<dependency org="org.apache.tomcat" name="tomcat-util-scan" rev="latest.release" transitive="false" />
+		<dependency org="com.orientechnologies" name="orientdb-enterprise" rev="2.1.+" transitive="true" />
+		<dependency org="com.orientechnologies" name="orientdb-graphdb" rev="2.1.+" transitive="true" />
+		<dependency org="com.orientechnologies" name="orientdb-server" rev="2.1.+" transitive="true" />
+		<!-- dependency org="com.tinkerpop" name="frames" rev="2.6.+" / -->
+		<dependency org="org.apache.tomcat" name="tomcat-catalina" rev="8.+" transitive="false" />
+		<dependency org="org.apache.tomcat" name="tomcat-juli" rev="8.+" transitive="false" />
+		<dependency org="org.apache.tomcat" name="tomcat-util-scan" rev="8.+" transitive="false" />
 	</dependencies>
 </ivy-module>

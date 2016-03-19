@@ -8,5 +8,5 @@ package com.ashtonit.odb.realm;
  */
 final class Version {
 
-    static final String VERSION = "2.0.1";
+    static final String VERSION = "2.1.0";
 }
