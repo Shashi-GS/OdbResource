@@ -1,2 +1,2 @@
 # OdbResource
-A Resource and realm for managing OrientDB connection pools in Tomcat
+Resources and a realm for managing OrientDB connection pools in Tomcat
