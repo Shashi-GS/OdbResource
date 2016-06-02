@@ -275,7 +275,7 @@ public class OdbRealm extends RealmBase {
     /**
      * This method is not supported by this implementation.
      *
-     * @return his method never returns
+     * @return this method never returns
      * @see RealmBase#getPrincipal(String)
      * @throws UnsupportedOperationException when called
      */
