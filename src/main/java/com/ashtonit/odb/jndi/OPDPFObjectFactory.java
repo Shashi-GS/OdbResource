@@ -20,20 +20,30 @@ import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
  * response to a JNDI lookup.
  * </p>
  * <p>
- * If the <code>configFile</code> attribute is present in configuration the OrientDB server will be started as an
- * embedded instance. If the attribute is not present it will just provide the {@link OPartitionedDatabasePoolFactory}
- * instance.
+ * The <code>auth</code> attribute should have the value "<code>Container</code>".
  * </p>
  * <p>
- * In a Tomcat web application, the name of this class is the value of the factory attribute of a
- * <code>&lt;Resource&gt;</code> tag. The parameters given in the table above are also specified as attributes of the
- * resource tag. The type attribute is
- * <code>com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory.</code> The resource should always be a
- * singleton and a closeMethod attribute with the value "<code>close</code>" should also be present. The
- * <code>auth</code> attribute should have the value "<code>Container</code>". The server config file for OrientDB
- * should be passed in with the attribute "<code>configFile</code>" if you wish to run an embedded OrientDB server. The
- * maximum number of connections can be set with the <code>capacity</code> attribute.<br>
- * e.g.
+ * The maximum number of connections can be set with the <code>capacity</code> attribute.
+ * </p>
+ * <p>
+ * The resource should always be a singleton and a <code>closeMethod</code> attribute with the value "<code>close</code>
+ * " should also be present.
+ * </p>
+ * <p>
+ * Use the name of this class as the value of the <code>factory</code> attribute of the <code>&lt;Resource&gt;</code>
+ * tag.
+ * </p>
+ * <p>
+ * The <code>server</code> attribute is optional and should be used when running an embedded database. It references an
+ * <code>OServer</code> instance produced by an <code>OServerObjectFactory</code> factory. If the server attribute is
+ * present and this element is not, you will get a naming exception. If the other resource element is present but the
+ * server attribute is not declared here, your server may never be started because the JNDI lookup never occurs.
+ * </p>
+ * <p>
+ * The <code>type</code> attribute is <code>com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory.</code>
+ * </p>
+ * <p>
+ * An example resource declaration:
  * </p>
  *
  * <pre>
@@ -41,17 +51,15 @@ import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
  *   auth="Container"
  *   capacity="100"
  *   closeMethod="close"
- *   configFile="/mnt/share/orientdb-community-2.1.3/config/orientdb-server-config.xml"
  *   factory="com.ashtonit.odb.OPDPFObjectFactory"
  *   name="opdpfactory"
- *   server="oServer"
+ *   server="oserver"
  *   singleton="true"
  *   type="com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory"
  * /&gt;
  * </pre>
  *
  * @author Bruce Ashton
- * @date 2015-10-03
  */
 public class OPDPFObjectFactory implements ObjectFactory {
 
@@ -65,20 +73,20 @@ public class OPDPFObjectFactory implements ObjectFactory {
 
 
     /**
-     * Returns an OPartitionedDatabasePoolFactory instance and optionally initialises an embedded OServer instance if
+     * Returns an OPartitionedDatabasePoolFactory instance and optionally initializes an embedded OServer instance if
      * the resource name is passed in as an attribute. This instance is always a singleton, regardless of attributes in
      * server.xml files etc.
      * <p>
-     * The OServer instance is just looked up in JNDI. It is the responsibility of the OServer object factory to
-     * actually start the server up.
+     * The OServer instance is just looked up in JNDI, if it is declared in the resource element. It is the
+     * responsibility of the OServer object factory to actually start the server up. Be sure to add a
+     * <code>OServerObjectFactory</code> resource element for the server if you do reference it here.
      *
      * @param obj the naming reference
      * @param name not used
-     * @param nameCtx not used
-     * @param environment not used
+     * @param nameCtx the naming context used if present
+     * @param environment used to create an initial context if a naming context is not passed in
      * @return the {@link OPartitionedDatabasePoolFactory} instance
-     * @throws NamingException if the config file is not a normal, readable file
-     * @throws RuntimeException if the embedded server startup throws an Exception
+     * @throws NamingException if the declared server instance cannot be found in the JNDI context
      * @see ObjectFactory#getObjectInstance(Object, Name, Context, Hashtable)
      */
     @Override

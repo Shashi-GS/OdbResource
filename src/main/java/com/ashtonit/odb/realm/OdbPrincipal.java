@@ -19,7 +19,6 @@ import org.ietf.jgss.GSSCredential;
  * can be used to instantiate an OrientGraph instance or obtain one through the pool.
  * 
  * @author Bruce Ashton
- * @date 2014-07-03
  */
 public class OdbPrincipal extends GenericPrincipal {
 

@@ -69,4 +69,21 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.3</version>
+				<configuration>
+					<links>
+						<link>http://docs.oracle.com/javaee/7/api/</link>
+						<link>http://orientdb.com/javadoc/latest/</link>
+						<link>http://tomcat.apache.org/tomcat-8.0-doc/api/</link>
+					</links>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>

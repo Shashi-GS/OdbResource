@@ -58,7 +58,6 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
  * </pre>
  *
  * @author Bruce Ashton
- * @date 2014-06-22
  */
 public class OdbRealm extends RealmBase {
 
@@ -100,8 +99,6 @@ public class OdbRealm extends RealmBase {
     /**
      * This method of authentication is not supported by this implementation.
      *
-     * @param gssContext
-     * @param storeCred
      * @return this method never returns
      * @see RealmBase#authenticate(GSSContext, boolean)
      * @throws UnsupportedOperationException when called
@@ -116,7 +113,6 @@ public class OdbRealm extends RealmBase {
     /**
      * This method of authentication is not supported by this implementation.
      *
-     * @param username
      * @return this method never returns
      * @see RealmBase#authenticate(String)
      * @throws UnsupportedOperationException when called
@@ -175,14 +171,6 @@ public class OdbRealm extends RealmBase {
     /**
      * This method of authentication is not supported by this implementation.
      *
-     * @param username
-     * @param clientDigest
-     * @param nonce
-     * @param nc
-     * @param cnonce
-     * @param qop
-     * @param realm
-     * @param md5a2
      * @return this method never returns
      * @see RealmBase#authenticate(String, String, String, String, String, String, String, String)
      * @throws UnsupportedOperationException when called
@@ -198,7 +186,6 @@ public class OdbRealm extends RealmBase {
     /**
      * This method of authentication is not supported by this implementation.
      *
-     * @param certs
      * @return this method never returns
      * @see RealmBase#authenticate(X509Certificate[])
      * @throws UnsupportedOperationException when called
@@ -274,7 +261,6 @@ public class OdbRealm extends RealmBase {
     /**
      * This method is not supported by this implementation.
      *
-     * @param username
      * @return this method never returns
      * @see RealmBase#getPassword(String)
      * @throws UnsupportedOperationException when called
@@ -289,7 +275,6 @@ public class OdbRealm extends RealmBase {
     /**
      * This method is not supported by this implementation.
      *
-     * @param username
      * @return his method never returns
      * @see RealmBase#getPrincipal(String)
      * @throws UnsupportedOperationException when called
