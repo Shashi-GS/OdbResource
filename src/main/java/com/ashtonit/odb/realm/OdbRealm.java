@@ -2,7 +2,6 @@ package com.ashtonit.odb.realm;
 
 import static com.ashtonit.odb.realm.Version.VERSION;
 
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -14,7 +13,6 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.apache.catalina.realm.MessageDigestCredentialHandler;
 import org.apache.catalina.realm.RealmBase;
 import org.ietf.jgss.GSSContext;
 
@@ -22,6 +20,7 @@ import com.orientechnologies.orient.core.db.OPartitionedDatabasePool;
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.security.OSecurityManager;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 
@@ -70,30 +69,12 @@ public class OdbRealm extends RealmBase {
     private static final String PASSWORD = "password";
     private static final String ROLES = "roles";
     private static final String SELECT = "select from OUser where name = ?";
-    private static final String SHA256 = "SHA-256";
-    private static final String SHA256_PREFIX = "{SHA-256}";
 
     private String dbPass;
     private String dbResource;
     private String dbUrl;
     private String dbUser;
     private OPartitionedDatabasePool pool;
-
-
-    /**
-     * The default constructor sets the SHA-256 message digest credential handler.
-     */
-    public OdbRealm() {
-        final MessageDigestCredentialHandler handler = new MessageDigestCredentialHandler();
-        try {
-            handler.setAlgorithm(SHA256);
-        } catch (final NoSuchAlgorithmException e) {
-            containerLog.error("Authentication failed: dbUrl=" + dbUrl, e);
-            log.severe("authenticate(String, String): dbUrl=" + dbUrl);
-            log.throwing(OdbRealm.class.getName(), "authenticate(String, String)", e);
-        }
-        setCredentialHandler(handler);
-    }
 
 
     /**
@@ -150,8 +131,14 @@ public class OdbRealm extends RealmBase {
         try {
             db = getDb();
             final ODocument document = getODocument(db, username);
-
-            if (getCredentialHandler().matches(password, getPassword(document))) {
+            if (document == null) {
+                return null;
+            }
+            final String hash = document.field(PASSWORD);
+            if (hash == null) {
+                return null;
+            }
+            if (OSecurityManager.instance().checkPassword(password, hash)) {
                 final List<String> roles = getRoles(document);
                 return new OdbPrincipal(username, password, roles, dbUrl);
             }
@@ -311,19 +298,6 @@ public class OdbRealm extends RealmBase {
             return null;
         }
         return list.get(0);
-    }
-
-
-    private String getPassword(final ODocument document) throws NoSuchAlgorithmException {
-        if (document != null) {
-            final String password = document.field(PASSWORD);
-            if (password != null && password.startsWith(SHA256_PREFIX)) {
-                // MessageDigestCredentialHandler cannot handle the prefix.
-                return password.substring(SHA256_PREFIX.length());
-            }
-            return password;
-        }
-        return null;
     }
 
 
