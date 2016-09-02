@@ -476,6 +476,9 @@ public class OdbRealm extends RealmBase {
                     // As above.
                     for (final ODocument roleDoc : roleDocs) {
                         final String role = roleDoc.field(roleNameField);
+                        if (role == null) {
+                            throw new NullPointerException("roleNameField " + roleNameField + " returned null");
+                        }
                         roles.add(role);
                     }
                 }
