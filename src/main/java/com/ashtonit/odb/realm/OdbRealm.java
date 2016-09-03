@@ -4,8 +4,6 @@ import static com.ashtonit.odb.realm.Version.VERSION;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -166,18 +164,15 @@ public class OdbRealm extends RealmBase {
     protected static final String name = "OdbRealm";
 
     private static final Logger log = Logger.getLogger(OdbRealm.class.getName());
+    private static final String PASSWORD = "password";
+    private static final String ROLES = "roles";
 
     private String dbPass;
     private String dbResource;
     private String dbUrl;
     private String dbUser;
     private OPartitionedDatabasePool pool;
-    private String roleNameField;
-    private String rolesField;
-    private String select;
-    private String userClass;
-    private String userNameField;
-    private String userPassField;
+    private String query;
 
 
     /**
@@ -233,19 +228,23 @@ public class OdbRealm extends RealmBase {
         ODatabaseDocumentTx db = null;
         try {
             db = getDb();
+
             final ODocument document = getODocument(db, username);
             if (document == null) {
                 return null;
             }
-            if (userPassField == null) {
-                throw new NullPointerException("userPassField must be set");
-            }
-            final String hash = document.field(userPassField);
+
+            final String hash = document.field(PASSWORD);
             if (hash == null) {
-                return null;
+                throw new NullPointerException("The password field of the query returned null");
             }
+
+            final List<String> roles = document.field(ROLES);
+            if (roles == null) {
+                throw new NullPointerException("The roles field of the query returned null");
+            }
+
             if (OSecurityManager.instance().checkPassword(password, hash)) {
-                final List<String> roles = getRoles(document);
                 return new OdbPrincipal(username, password, roles, dbUrl);
             }
         } catch (final Exception e) {
@@ -340,52 +339,12 @@ public class OdbRealm extends RealmBase {
 
 
     /**
-     * Sets the field on the role class that references the role name.
-     *
-     * @param roleNameField the field that references the role name
+     * Sets the SQL query used to select the password and roles for the given user name.
+     * 
+     * @param query the query used to select the password and roles for the given user name
      */
-    public void setRoleNameField(final String roleNameField) {
-        this.roleNameField = roleNameField;
-    }
-
-
-    /**
-     * Sets the field on the user class that references the roles collection
-     *
-     * @param rolesField the field that references the roles collection
-     */
-    public void setRolesField(final String rolesField) {
-        this.rolesField = rolesField;
-    }
-
-
-    /**
-     * Sets the name of the user class, that is the class that holds username and password records.
-     *
-     * @param userClass the name of the user class
-     */
-    public void setUserClass(final String userClass) {
-        this.userClass = userClass;
-    }
-
-
-    /**
-     * Sets the field on the user class that references the user name.
-     *
-     * @param userNameField the field that references the user name
-     */
-    public void setUserNameField(final String userNameField) {
-        this.userNameField = userNameField;
-    }
-
-
-    /**
-     * Sets the field on the user class that references the password.
-     *
-     * @param userPassField the field that references the password
-     */
-    public void setUserPassField(final String userPassField) {
-        this.userPassField = userPassField;
+    public void setQuery(final String query) {
+        this.query = query;
     }
 
 
@@ -447,63 +406,12 @@ public class OdbRealm extends RealmBase {
 
 
     private final ODocument getODocument(final ODatabaseDocumentTx db, final String username) {
-        final OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<ODocument>(getSelect(), 1);
-        final List<ODocument> list = db.command(query).execute(username);
+        final OSQLSynchQuery<ODocument> syncQuery = new OSQLSynchQuery<ODocument>(query, 1);
+        final List<ODocument> list = db.command(syncQuery).execute(username);
         if (list.isEmpty()) {
             containerLog.warn(username + " not found in database " + dbUrl);
             return null;
         }
         return list.get(0);
-    }
-
-
-    private final List<String> getRoles(final ODocument document) {
-        final List<String> roles = new ArrayList<String>();
-        if (document != null) {
-            if (rolesField == null) {
-                throw new NullPointerException("rolesField must be set");
-            }
-            if (roleNameField == null) {
-                final Collection<String> roleNames = document.field(rolesField);
-                if (roleNames != null) {
-                    // If there are no roles, add an empty collection to the
-                    // principal. Let the chips fall where they may.
-                    roles.addAll(roleNames);
-                }
-            } else {
-                final Collection<ODocument> roleDocs = document.field(rolesField);
-                if (roleDocs != null) {
-                    // As above.
-                    for (final ODocument roleDoc : roleDocs) {
-                        final String role = roleDoc.field(roleNameField);
-                        if (role == null) {
-                            throw new NullPointerException("roleNameField " + roleNameField + " returned null");
-                        }
-                        roles.add(role);
-                    }
-                }
-            }
-        }
-        return roles;
-    }
-
-
-    private String getSelect() {
-        if (select == null) {
-            if (userClass == null) {
-                throw new NullPointerException("userClass must be set");
-            }
-            if (userNameField == null) {
-                throw new NullPointerException("userNameField must be set");
-            }
-            final StringBuilder builder = new StringBuilder(64);
-            builder.append("select from ");
-            builder.append(userClass);
-            builder.append(" where ");
-            builder.append(userNameField);
-            builder.append(" = ?");
-            select = builder.toString();
-        }
-        return select;
     }
 }
