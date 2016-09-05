@@ -30,78 +30,17 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
  * authentication classes used are now configurable.
  * </p>
  * <p>
- * It makes certain assumptions about the structure of the classes containing user and role records:
+ * It takes an OSQL query string as a attribute named <code>query</code> which must return the password hash and the
+ * roles for a user.
+ * </p>
+ * <p>
+ * The query must:
  * </p>
  * <ul>
- * <li>There will be a class holding user records with a unique username field.</li>
- * <li>Each user record will have a password field.</li>
- * <li>The password field will be encrypted in the same manner as the <code>password</code> field for
- * <code>OUser.</code> (Or it may be plain text.)</li>
- * <li>Each user record will contain a collection of roles represented by either linked documents or strings.</li>
+ * <li>Take one parameter (the user name or identifier)</li>
+ * <li>Return the password hash as a {@link String} for the user with a parameter name of, "password"</li>
+ * <li>Return the role names for the user as a {@link List} of {@link String}s with a parameter name of, "roles"</li>
  * </ul>
- * <p>
- * The following is an example class for user records holding role names as strings:
- * </p>
- * 
- * <pre>
- * _________________________
- * | User                   |
- * |------------------------|
- * | name:     String       |
- * | password: String       |
- * | roles:    List&lt;String&gt; |
- * |________________________|
- * </pre>
- * 
- * Here the attributes would be:
- * <ul>
- * <li><code>userClass="User"</code></li>
- * <li><code>userNameField="name"</code></li>
- * <li><code>userPassField="password"</code></li>
- * <li><code>rolesField="roles"</code></li>
- * </ul>
- * <p>
- * An alternative example where the roles are a separate linked document:
- * </p>
- * 
- * <pre>
- * _______________________ 
- * | MyUser               |
- * |----------------------|
- * | username: String     |
- * | password: String     |   ___________________ 
- * | roles:    List&lt;Role&gt; |==&gt;| MyRole           |
- * |______________________|   |------------------|
- *                            | rolename: String |
- *                            |__________________|
- * </pre>
- * 
- * Here the attributes would be:
- * <ul>
- * <li><code>userClass="MyUser"</code></li>
- * <li><code>userNameField="username"</code></li>
- * <li><code>userPassField="password"</code></li>
- * <li><code>rolesField="roles"</code></li>
- * <li><code>roleNameField="rolename"</code></li>
- * </ul>
- * <p>
- * The latter example is essentially the same structure as the built-in OUser and ORole classes. This realm can be used
- * to authenticate against those classes, using actual database users.
- * </p>
- * <p>
- * For the former structure, set the <code>rolesField</code> attribute on the realm but not the
- * <code>roleNameField</code> attribute. <code>OdbRealm</code> will then assume the field is a collection of strings.
- * </p>
- * <p>
- * For the latter structure, with a separate Role class:
- * </p>
- * <ul>
- * <li>Set the <code>rolesField</code> attribute to the name of the collection field on the user class</li>
- * <li>Set the <code>roleNameField</code> attribute to the name of the unique name field on the Role class.</li>
- * </ul>
- * <p>
- * In this case <code>OdbRealm</code> will then assume the field is a collection of {@link ODocument}s.
- * </p>
  * <p>
  * The password is checked using the method {@link OSecurityManager#checkPassword(String, String)}. It checks for three
  * different types of password hashes by looking at the prefix of the string. They are:
@@ -125,14 +64,8 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
  * your OdbResource configuration. If it is not present the realm creates its own instance of
  * {@link OPartitionedDatabasePool} with the default capacity of 100.</li>
  * <li>The value of the <code>dbUrl</code> attribute must be a valid OrientDB URI.</li>
- * <li>The <code>roleNameField</code> attribute is optional and indicates the roles filed on the user class is a
- * collection of documents.</li>
- * <li>The value of the <code>rolesField</code> attribute is field on the user class referencing the roles collection.</li>
- * <li>The value of the <code>userClass</code> attribute is the name of the class holding user records.</li>
- * <li>The value of the <code>userNameField</code> attribute is the user class field holding the unique user name or
- * identifier.</li>
- * <li>The value of the <code>userPassField</code> attribute is the user class field holding the encrypted password or
- * credentials for the user.</li>
+ * <li>The value of the <code>query</code> attribute must be an OSQL query string that takes one parameter (a user
+ * identifier) and returns the password hash and roles.</li>
  * </ol>
  * <p>
  * An example OdbRealm definition:
@@ -144,11 +77,7 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
  *     dbResource="opdpfactory"
  *     dbUrl="plocal:/opt/odb/mydb"
  *     dbUser="admin"
- *     roleNameField="name"
- *     rolesField="roles"
- *     userClass="OUser"
- *     userNameField="name"
- *     userPassField="password"
+ *     query="SELECT password, roles.name AS roles FROM OUser WHERE status = 'ACTIVE' AND name = ?"
  *   /&gt;
  * </pre>
  * <p>
