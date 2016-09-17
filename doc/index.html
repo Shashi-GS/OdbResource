@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>OdbResource and OdbRealm</title>
+<title>OdbResource</title>
 <meta charset="utf-8">
 <meta name="author" content="Bruce Ashton">
-<meta name="description"
-	content="How to use the OdbResource and OdbRealm libraries">
+<meta name="description" content="How to use the OdbResource library">
 <style type="text/css">
 <!--
 body {
@@ -138,15 +137,14 @@ th {
 </style>
 </head>
 <body>
-	<h1>OdbResource and OdbRealm</h1>
+	<h1>OdbResource</h1>
 	<div>
 		<hr class="divider" />
 	</div>
 
 	<h2>Useful Links</h2>
 	<p>
-		<strong><a href="api/index.html">OdbResource and OdbRealm
-				Javadocs</a></strong>
+		<strong><a href="api/index.html">OdbResource Javadocs</a></strong>
 	</p>
 	<p>
 		<a href="http://orientdb.com/docs/last/">OrientDB Manual</a>
@@ -197,18 +195,16 @@ th {
 
 		<div class="content">
 			<h3>Download and Install</h3>
-			<p>
 			<ol>
 				<li>Download the latest binary release from the <a
 					href="https://github.com/skwidge/OdbResource/releases/"
 					target="_blank">OdbResource release page on Github</a>. Or download
 					the source and build the <strong>dist</strong> target with ant.
 				</li>
-				<li>Unzip the file odbresource-[<em>version number</em>]-bin.zip in
-					the lib directory of Apache Tomcat.
+				<li>Unzip the file odbresource-[<em>version number</em>]-bin.zip
+					in the lib directory of Apache Tomcat.
 				</li>
 			</ol>
-			</p>
 
 			<h3>Configuration</h3>
 			<p>
@@ -227,7 +223,7 @@ th {
 					look up the OServerObjectFactory resource which will start the
 					embedded OrientDB server.
 				</p>
-				<p>OServerObjectFactory resource declaration:
+				<p>OServerObjectFactory resource declaration:</p>
 				<pre>
               &lt;Resource
                 auth="Container"
@@ -239,10 +235,12 @@ th {
                 type="com.orientechnologies.orient.server.OServer"
               /&gt;
             	</pre>
-				The only attribute in the above element that is not described in the
-				Tomcat configuration guide is <strong>configFile</strong>. The value
-				of this attribute is the name of the configuration file for the
-				OrientDB server. Refer to the OrientDB manual when editing this.
+				<p>
+					The only attribute in the above element that is not described in
+					the Tomcat configuration guide is <strong>configFile</strong>. The
+					value of this attribute is the name of the configuration file for
+					the OrientDB server. Refer to the OrientDB manual when editing
+					this.
 				</p>
 				<h4>OPDPFObjectFactory</h4>
 				<p>The OPDPFObjectFactory class must be configured as a JNDI
@@ -260,6 +258,7 @@ th {
 						href="https://tomcat.apache.org/tomcat-8.0-doc/config/context.html#Resource_Definitions"
 						target="_blank">Tomcat guide on resource configuration is here</a>.
 					Important things to note for OdbResource configuration are:
+				</p>
 				<ol>
 					<li>The auth attribute must have a value of "Container"</li>
 					<li>The capacity attribute sets the maximum number of
@@ -276,8 +275,7 @@ th {
 						ensure that the close method is run (In fact the factory remains a
 						singleton regardless of this attribute.)</li>
 				</ol>
-				</p>
-				<p>OPDPFObjectFactory resource declaration:
+				<p>OPDPFObjectFactory resource declaration:</p>
 				<pre>
               &lt;Resource
                 auth="Container"
@@ -290,17 +288,19 @@ th {
                 type="com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory"
               /&gt;
                 </pre>
-				The only attributes in the above element that are not described in
-				the Tomcat configuration guide are <strong>capacity</strong> and <strong>server</strong>.
-				The <strong>server</strong> attribute must be present only if you
-				want to run an embedded OrientDB server. The value must match the
-				value of the <strong>name</strong> attribute for the OServer
-				resource declaration.
+				<p>
+					The only attributes in the above element that are not described in
+					the Tomcat configuration guide are <strong>capacity</strong> and <strong>server</strong>.
+					The <strong>server</strong> attribute must be present only if you
+					want to run an embedded OrientDB server. The value must match the
+					value of the <strong>name</strong> attribute for the OServer
+					resource declaration.
 				</p>
 				<p>
 					Finally, to make the resource available to a given web application
 					you also must add it as a <strong>Resource Link</strong> in the web
 					app's <strong>context.xml:</strong>.
+				</p>
 				<pre>
               &lt;?xml version="1.0" encoding="UTF-8"?&gt;
               &lt;Context&gt;
@@ -309,10 +309,11 @@ th {
                 &lt;/ResourceLink&gt;
               &lt;/Context&gt;
             	</pre>
-				The <a
-					href="https://tomcat.apache.org/tomcat-8.0-doc/jndi-resources-howto.html"
-					target="_blank">Tomcat guide on JNDI resource configuration is
-					here</a>.
+				<p>
+					The <a
+						href="https://tomcat.apache.org/tomcat-8.0-doc/jndi-resources-howto.html"
+						target="_blank">Tomcat guide on JNDI resource configuration is
+						here</a>.
 				</p>
 
 				<h4>OdbRealm</h4>
@@ -330,6 +331,7 @@ th {
 						target="_blank">API documentation</a> for OdbRealm for more
 					information on this specific implementation. Important things to
 					note for OdbRealm configuration are:
+				</p>
 				<ol>
 					<li>The className attribute must have a value of
 						"com.ashtonit.odb.realm.OdbRealm"</li>
@@ -349,6 +351,9 @@ th {
 					</li>
 					<li>The value of the dbUrl attribute must be a valid OrientDB
 						URI</li>
+					<li>The value of the query attribute must be an OSQL query
+						string that takes one parameter (a user identifier) and returns
+						the password hash and roles</li>
 				</ol>
 				<pre>
               &lt;Realm
@@ -357,8 +362,48 @@ th {
                 dbResource="opdpfactory"
                 dbUrl="plocal:/opt/odb/mygraphdb"
                 dbUser="admin"
+                query="SELECT password, roles.name AS roles FROM OUser WHERE status = 'ACTIVE' AND name = ?"
               /&gt;
             	</pre>
+				<p>
+					OdbRealm was originally written to authenticate only against the
+					built-in
+					<code>OUser</code>
+					and
+					<code>ORole</code>
+					classes but the authentication is now configurable by a query.
+				</p>
+				<p>
+					It takes an OSQL query string as a attribute named
+					<code>query</code>
+					which must return the password hash and the roles for a user.
+				</p>
+				<p>The query must:</p>
+				<ul>
+					<li>Take one parameter (the user name or identifier)</li>
+					<li>Return the password hash as a String for the user with a
+						parameter name of, "password"</li>
+					<li>Return the role names for the user as a List of Strings
+						with a parameter name of, "roles"</li>
+				</ul>
+				<p>
+					The password is checked using the method <a
+						href="http://orientdb.com/javadoc/latest/com/orientechnologies/orient/core/security/OSecurityManager.html#checkPassword-java.lang.String-java.lang.String-">OSecurityManager.checkPassword(String,
+						String)</a>. It checks for three different types of password hashes by
+					looking at the prefix of the string. They are:
+				</p>
+				<ul>
+					<li>SHA-256 (A string prefix of <code>{SHA-256}-</code>)
+					</li>
+					<li>PBKDF2WithHmacSHA1 (A string prefix of <code>{PBKDF2WithHmacSHA1}-</code>)
+					</li>
+					<li>PBKDF2WithHmacSHA256 (A string prefix of <code>{PBKDF2WithHmacSHA256}-</code>)
+					</li>
+				</ul>
+				<p>
+					The simplest way to create a password hash in the correct format is
+					to use the method <a
+						href="http://orientdb.com/javadoc/latest/com/orientechnologies/orient/core/metadata/security/OUser.html#encryptPassword-java.lang.String-">OUser.encryptPassword(String)</a>.
 				</p>
 				<p>
 					The <a
@@ -375,7 +420,12 @@ th {
 			<h3>A Servlet Example</h3>
 			<p>Here we have a simple example showing how to look up the
 				database pool factory in the JNDI context, obtain and use an
-				OrientGraph instance and release it again.
+				OrientGraph instance and release it again.</p>
+			<p>NOTE: The example given below pulls the username and password
+				from the principal. This only makes sense when you are
+				authenticating agains the built-in OUser and ORole classes. For any
+				other data model you will need the username and password of a
+				database user configured statically.
 			<pre>
             public class MyServlet extends HttpServlet {
 
@@ -386,6 +436,13 @@ th {
                     Context envCtx = (Context) initCtx.lookup("java:comp/env");
                     OPartitionedDatabasePoolFactory factory = (OPartitionedDatabasePoolFactory) envCtx.lookup("opdpfactory");
                     OdbPrincipal principal = (OdbPrincipal) httpRequest.getUserPrincipal();
+                    
+                    // Get the username and the password from the principal only if
+                    // you are authenticating an actual database user, i.e. against
+                    // the OUser and ORole classes. If you are authenticating against
+                    // your own classes you will need a username and password for an
+                    // actual database user. Add these using some kind of static
+                    // configuration - i.e. Spring, from your web.xml, etc.
                     OPartitionedDatabasePool pool = factory.get(principal.getDbUrl(),
                                                                 principal.getName(),
                                                                 principal.getPassword());
@@ -404,19 +461,18 @@ th {
                         out.println("&lt;/html&gt;");
         
                     } finally {
-                        if (graph != null && !graph.isClosed()) {
+                        if (graph != null &amp;&amp; !graph.isClosed()) {
                             graph.shutdown();
                         }
                     }
                 }
             }
           	</pre>
-			You may notice that the database URI is obtained from the principal.
-			This allows multiple databases, each managed by a different realm.
-			The OdbResource configuration defines the server, not the database.
-			</p>
+			<p>You may notice that the database URI is obtained from the
+				principal. This allows multiple databases, each managed by a
+				different realm. The OdbResource configuration defines the server,
+				not the database.</p>
 		</div>
-		<p>Here endeth the user guide.</p>
 	</div>
 
 	<div>

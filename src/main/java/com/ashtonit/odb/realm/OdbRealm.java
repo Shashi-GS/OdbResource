@@ -26,8 +26,8 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
  * A Tomcat Realm class for OrientDB databases.
  * <p>
  * OdbRealm allows a web application to authenticate users against an embedded or standalone OrientDB database. It was
- * originally written to authenticate against the built-in <code>OUser</code> and <code>ORole</code> classes but the
- * authentication classes used are now configurable.
+ * originally written to authenticate only against the built-in <code>OUser</code> and <code>ORole</code> classes but
+ * the authentication is now configurable by a query.
  * </p>
  * <p>
  * It takes an OSQL query string as a attribute named <code>query</code> which must return the password hash and the
