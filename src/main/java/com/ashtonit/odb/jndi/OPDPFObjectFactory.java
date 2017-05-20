@@ -68,7 +68,7 @@ public class OPDPFObjectFactory implements ObjectFactory {
     private static final Object LOCK = new Object();
     private static final String SERVER = "server";
 
-    private static OPartitionedDatabasePoolFactory factory;
+    private static volatile OPartitionedDatabasePoolFactory factory;
     private static Object server;
 
 

@@ -137,7 +137,7 @@ public class OdbPrincipal extends GenericPrincipal {
      */
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("ImapPrincipal[");
+        final StringBuilder sb = new StringBuilder("OdbPrincipal[");
         sb.append(name);
         sb.append("(");
         if (roles != null && roles.length > 0) {

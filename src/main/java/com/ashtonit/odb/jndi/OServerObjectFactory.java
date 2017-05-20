@@ -54,7 +54,7 @@ public class OServerObjectFactory implements ObjectFactory {
 
     private static final Object LOCK = new Object();
 
-    private static OServer server;
+    private static volatile OServer server;
 
 
     /**
