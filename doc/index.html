@@ -417,6 +417,23 @@ th {
 					the servlet example just below.
 				</p>
 			</div>
+			<h3>Declare Dependency</h3>
+                        <p>OdbResource is available as
+                          <a href="https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22odbresource%22"
+                             target="_blank">a dependency from the Maven Central Repository</a>.
+                          Declare it with a scope of <strong>provided</strong> in your web application. The
+                          library itself must be available to the container at start up. An example is given for Maven:
+                          <pre>
+              &lt;dependency&gt;
+                  &lt;groupId&gt;com.ashtonit&lt;/groupId&gt;
+                  &lt;artifactId&gt;odbresource&lt;/artifactId&gt;
+                  &lt;version&gt;[2.2,2.3)&lt;/version&gt;
+                  &lt;scope&gt;provided&lt;/scope&gt;
+              &lt;/dependency&gt;
+                          </pre>
+			<p>Here we have a simple example showing how to look up the
+				database pool factory in the JNDI context, obtain and use an
+				OrientGraph instance and release it again.</p>
 			<h3>A Servlet Example</h3>
 			<p>Here we have a simple example showing how to look up the
 				database pool factory in the JNDI context, obtain and use an
