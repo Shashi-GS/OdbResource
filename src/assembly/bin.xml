@@ -12,14 +12,14 @@
 	<fileSets>
 		<fileSet>
 			<directory>${project.basedir}</directory>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory/>
 			<includes>
 				<include>LICENSE</include>
 			</includes>
 		</fileSet>
 		<fileSet>
 			<directory>${project.build.directory}</directory>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory/>
 			<includes>
 				<include>odbresource-*.jar</include>
 			</includes>
@@ -31,7 +31,7 @@
 	</fileSets>
 	<dependencySets>
 		<dependencySet>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory/>
 		</dependencySet>
 	</dependencySets>
 </assembly>
