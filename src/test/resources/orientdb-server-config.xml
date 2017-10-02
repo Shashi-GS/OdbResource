@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<orient-server>
+	<handlers>
+		<handler class="com.orientechnologies.orient.server.handler.OServerSideScriptInterpreter">
+			<parameters>
+				<parameter value="true" name="enabled" />
+				<parameter value="SQL" name="allowedLanguages" />
+			</parameters>
+		</handler>
+	</handlers>
+	<network>
+		<sockets>
+		</sockets>
+		<protocols>
+		</protocols>
+		<listeners>
+		</listeners>
+	</network>
+	<storages />
+	<users>
+		<user resources="*" password="password" name="root" />
+	</users>
+	<properties>
+		<entry value="1" name="db.pool.min" />
+		<entry value="5" name="db.pool.max" />
+		<entry value="false" name="profiler.enabled" />
+	</properties>
+	<isAfterFirstTime>true</isAfterFirstTime>
+</orient-server>

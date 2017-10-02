@@ -4,6 +4,7 @@
 /bin/
 /build/
 /classes/
+/databases/
 /lib/
 /odbresource-*.zip
 /target/
